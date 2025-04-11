@@ -10,6 +10,6 @@ class PaymentLinkController extends Controller
 {
   public function index()
   {
-    return view('doctor.payment.link');
+    return view('doctor.send-payment-link');
   }
 }

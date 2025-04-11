@@ -17,8 +17,23 @@ class ProfileController extends Controller
   public function update(Request $request)
   {
     $request->validate([
-      'name' => 'required|string|max:255',
-      'phone' => 'nullable|string|max:20',
+      'name' => [
+        'required',
+        'string',
+        'max:255',
+        'regex:/^[a-zA-Z\s]+$/'
+      ],
+      'phone' => [
+        'nullable',
+        'string',
+        'max:20',
+        'regex:/^[0-9+\-\s\(\)]+$/',
+        'digits:10'
+      ],
+    ], [
+      'name.required' => 'Please enter your full name.',
+      'name.regex' => 'Name can only contain letters and spaces.',
+      'phone.regex' => 'Phone number format is invalid.',
     ]);
 
     $user = Auth::user();
@@ -28,4 +43,5 @@ class ProfileController extends Controller
 
     return redirect('doctor/dashboard')->with('success', 'Profile updated successfully!');
   }
+
 }

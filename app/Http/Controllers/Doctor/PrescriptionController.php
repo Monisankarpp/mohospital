@@ -11,6 +11,6 @@ class PrescriptionController extends Controller
 {
   public function index()
   {
-    return view('doctor.prescription.upload');
+    return view('doctor.prescription-upload');
   }
 }
