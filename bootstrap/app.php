@@ -15,7 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Register route middleware here
         $middleware->alias([
+            'auth' => \App\Http\Middleware\RedirectIfAuthenticated::class,
             'guest' => \App\Http\Middleware\RedirectIfAuthenticatedRoleBased::class,
+            'role' => \App\Http\Middleware\EnsureUserRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

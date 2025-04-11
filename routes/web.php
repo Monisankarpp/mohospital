@@ -3,9 +3,24 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+
+use App\Http\Controllers\Patient\{
+    DashboardController as PatientDashboardController,
+    ProfileController as PatientProfileController,
+    AppointmentController as PatientAppointmentController,
+    PrescriptionController as PatientPrescriptionController,
+    PaymentController as PatientPaymentController
+};
+use App\Http\Controllers\Doctor\{
+    DashboardController as DoctorDashboardController,
+    ProfileController as DoctorProfileController,
+    AppointmentController as DoctorAppointmentController,
+    PrescriptionController as DoctorPrescriptionController,
+    PaymentLinkController as DoctorPaymentLinkController
+};
 
 
 Route::get('/', function () {
@@ -41,33 +56,30 @@ Route::controller(ResetPasswordController::class)
         Route::post('/reset-password', 'reset')->name('password.update');
     });
 
+// --------------------
+// Patient Routes
+// --------------------
+Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(function () {
+    Route::get('/dashboard', [PatientDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [PatientProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [PatientProfileController::class, 'update'])->name('profile.update');
 
+    Route::get('/appointments', [PatientAppointmentController::class, 'index'])->name('appointments.book');
+    Route::get('/prescriptions', [PatientPrescriptionController::class, 'index'])->name('prescriptions');
+    Route::get('/payments', [PatientPaymentController::class, 'index'])->name('payments');
+});
 
+// --------------------
+// Doctor Routes
+// --------------------
+Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
+    Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [DoctorProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [DoctorProfileController::class, 'update'])->name('profile.update');
 
+    Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
+    Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
+    Route::get('/send-payment-link', [DoctorPaymentLinkController::class, 'index'])->name('payment.link');
+});
 
-Route::middleware(['role:patient'])->get('/dashboard/patient', function () {
-    return view('dashboards.patient');
-})->name('patient.dashboard');
-
-
-
-// Doctor Dashboard
-Route::middleware(['role:doctor'])->get('/dashboard/doctor', function () {
-    return view('dashboards.doctor');
-})->name('doctor.dashboard');
-
-// Medical Store Owner Dashboard
-Route::middleware(['role:medical_store_owner'])->get('/dashboard/medical-store', function () {
-    return view('dashboards.medical-store');
-})->name('medical-store.dashboard');
-
-// Hospital Owner Dashboard
-Route::middleware(['role:hospital_owner'])->get('/dashboard/hospital', function () {
-    return view('dashboards.hospital');
-})->name('hospital.dashboard');
-
-// Super Admin Dashboard
-Route::middleware(['role:super_admin'])->get('/dashboard/admin', function () {
-    return view('dashboards.admin');
-})->name('admin.dashboard');
 

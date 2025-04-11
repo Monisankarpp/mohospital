@@ -63,7 +63,7 @@
                     </li>
                 </ul>
                 <div class="d-flex">
-                    <a href="" class="btn btn-outline-light">Login</a>
+                    <a href="{{route('login')}}" class="btn btn-outline-light">Login</a>
                     <a href="{{route('register.form')}}" class="btn btn-light ms-2">Register</a>
                 </div>
             </div>
