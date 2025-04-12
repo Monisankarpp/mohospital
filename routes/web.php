@@ -61,9 +61,10 @@ Route::controller(ResetPasswordController::class)
 // --------------------
 Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(function () {
     Route::get('/dashboard', [PatientDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [PatientProfileController::class, 'index'])->name('profile');
-    Route::post('/profile/update', [PatientProfileController::class, 'update'])->name('profile.update');
-
+    Route::controller(PatientProfileController::class)->group(function () {
+        Route::get('/profile', 'index')->name('profile');
+        Route::post('/profile/update', 'update')->name('profile.update');
+    });
     Route::get('/appointments', [PatientAppointmentController::class, 'index'])->name('appointments.book');
     Route::get('/prescriptions', [PatientPrescriptionController::class, 'index'])->name('prescriptions');
     Route::get('/payments', [PatientPaymentController::class, 'index'])->name('payments');
@@ -74,9 +75,10 @@ Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(
 // --------------------
 Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
     Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [DoctorProfileController::class, 'index'])->name('profile');
-    Route::post('/profile/update', [DoctorProfileController::class, 'update'])->name('profile.update');
-
+    Route::controller(DoctorProfileController::class)->group(function () {
+        Route::get('/profile', 'index')->name('profile');
+        Route::post('/profile/update', 'update')->name('profile.update');
+    });
     Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
     Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
     Route::get('/send-payment-link', [DoctorPaymentLinkController::class, 'index'])->name('payment.link');

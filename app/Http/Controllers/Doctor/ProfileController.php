@@ -3,45 +3,32 @@
 namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Doctor\UpdateProfileRequest;
+use App\Services\Doctor\DoctorProfileService;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
+  protected DoctorProfileService $profileService;
+
+  public function __construct(DoctorProfileService $profileService)
+  {
+    $this->profileService = $profileService;
+  }
+
   public function index()
   {
-    $user = Auth::user();
-    return view('doctor.profile', compact('user'));
-  }
-
-  public function update(Request $request)
-  {
-    $request->validate([
-      'name' => [
-        'required',
-        'string',
-        'max:255',
-        'regex:/^[a-zA-Z\s]+$/'
-      ],
-      'phone' => [
-        'nullable',
-        'string',
-        'max:20',
-        'regex:/^[0-9+\-\s\(\)]+$/',
-        'digits:10'
-      ],
-    ], [
-      'name.required' => 'Please enter your full name.',
-      'name.regex' => 'Name can only contain letters and spaces.',
-      'phone.regex' => 'Phone number format is invalid.',
+    return view('doctor.profile', [
+      'user' => Auth::user(),
     ]);
-
-    $user = Auth::user();
-    $user->name = $request->name;
-    $user->phone = $request->phone;
-    $user->save();
-
-    return redirect('doctor/dashboard')->with('success', 'Profile updated successfully!');
   }
 
+  public function update(UpdateProfileRequest $request)
+  {
+    $this->profileService->update($request->validated());
+
+    return redirect()
+      ->route('doctor.dashboard')
+      ->with('success', 'Profile updated successfully!');
+  }
 }
