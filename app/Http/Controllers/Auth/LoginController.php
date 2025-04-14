@@ -25,26 +25,49 @@ class LoginController extends Controller
 
     public function login(LoginRequest $request): RedirectResponse
     {
-        $key = 'login:' . $request->ip();
+        $email = strtolower($request->input('email'));
+        $key = 'login:' . $email . '|' . $request->ip();
 
-        if (RateLimiter::tooManyAttempts($key, 5)) {
-            return back()->withErrors([
-                'email' => 'Too many login attempts. Please try again in a few minutes.',
-            ])->withInput();
+        $maxAttempts = 5; // 5 attempts allowed
+        $decaySeconds = 60; // 1 minute lockout
+
+        // Check if already locked out
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            $secondsRemaining = RateLimiter::availableIn($key);
+            return back()
+                ->withErrors([
+                    'email' => "Too many login attempts.",
+                ])
+                ->with('seconds_remaining', $secondsRemaining)
+                ->with('attempts_left', 0)
+                ->withInput();
         }
-
-        RateLimiter::hit($key, 60); // lockout for 60 seconds after 5 failed attempts
 
         $credentials = $request->validated();
         $remember = $request->filled('remember');
 
+        if (strlen($credentials['password']) < 8) {
+            return back()
+                ->withErrors(['password' => 'Password must be at least 8 characters.'])
+                ->with('attempts_left', $maxAttempts - RateLimiter::attempts($key))
+                ->withInput();
+        }
+
         if ($this->loginService->authenticate($credentials, $remember)) {
-            RateLimiter::clear($key); // Clear attempts on success
+            RateLimiter::clear($key);
             return $this->loginService->redirectBasedOnRole();
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials.'])->withInput();
+        // Increment attempt counter
+        RateLimiter::hit($key, $decaySeconds);
+        $attemptsRemaining = $maxAttempts - RateLimiter::attempts($key);
+
+        return back()
+            ->withErrors(['email' => 'The email address or password you entered is incorrect.'])
+            ->with('attempts_left', $attemptsRemaining)
+            ->withInput();
     }
+
 
     public function logout(): RedirectResponse
     {

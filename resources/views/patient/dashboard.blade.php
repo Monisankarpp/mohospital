@@ -75,14 +75,14 @@
         <!-- Upcoming Appointments Section -->
         <div class="card mb-4 border-0"
             style="
-    border-radius: 16px;
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    box-shadow: 0 6px 20px rgba(100, 149, 237, 0.15);
-    ">
+                border-radius: 16px;
+                background: linear-gradient(145deg, #ffffff, #f8f9fa);
+                box-shadow: 0 6px 20px rgba(100, 149, 237, 0.15);
+                ">
             <div class="card-header bg-transparent border-0 pt-4 pb-3 d-flex justify-content-between align-items-center">
                 <div>
                     <h5 class="mb-1 text-primary" style="font-weight: 600;">
-                        <i class="fas fa-calendar-check me-2" style="color: #6c5ce7;"></i>
+                        <i class="fas fa-calendar-check me-2 text-primary"></i>
                         Upcoming Appointments
                     </h5>
                     <p class="text-muted mb-0" style="font-size: 0.85rem;">
@@ -91,12 +91,12 @@
                 </div>
                 <a href="#" class="btn rounded-pill px-4 py-2"
                     style="
-    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-    color: white;
-    border: none;
-    font-weight: 500;
-    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
-    ">
+                        background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+                        color: white;
+                        border: none;
+                        font-weight: 500;
+                        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+                        ">
                     <i class="fas fa-plus me-2"></i> New Appointment
                 </a>
             </div>
@@ -126,10 +126,10 @@
                                         <div class="position-relative me-3">
                                             <div class="rounded-circle d-flex align-items-center justify-content-center"
                                                 style="
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(108, 92, 231, 0.2));
-      ">
+                                                    width: 42px;
+                                                    height: 42px;
+                                                    background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(108, 92, 231, 0.2));
+                                                    ">
                                                 <i class="fas fa-user-md" style="color: #6c5ce7;"></i>
                                             </div>
                                         </div>
@@ -142,10 +142,10 @@
                                 <td class="py-3">
                                     <span class="badge rounded-pill py-2 px-3"
                                         style="
-      background: rgba(108, 92, 231, 0.1);
-      color: #6c5ce7;
-      font-weight: 500;
-      ">
+                                            background: rgba(108, 92, 231, 0.1);
+                                            color: #6c5ce7;
+                                            font-weight: 500;
+                                            ">
                                         Cardiology
                                     </span>
                                 </td>
@@ -158,21 +158,21 @@
                                 <td class="py-3">
                                     <span class="badge rounded-pill py-2 px-3"
                                         style="
-      background: rgba(46, 213, 115, 0.1);
-      color: #2ed573;
-      font-weight: 500;
-      ">
+                                            background: rgba(46, 213, 115, 0.1);
+                                            color: #2ed573;
+                                            font-weight: 500;
+                                            ">
                                         <i class="fas fa-check-circle me-1"></i> Confirmed
                                     </span>
                                 </td>
                                 <td class="pe-4 py-3 text-end">
                                     <button class="btn btn-sm rounded-pill px-3 py-2"
                                         style="
-      background: rgba(108, 92, 231, 0.1);
-      color: #6c5ce7;
-      border: none;
-      font-weight: 500;
-      ">
+                                            background: rgba(108, 92, 231, 0.1);
+                                            color: #6c5ce7;
+                                            border: none;
+                                            font-weight: 500;
+                                            ">
                                         Details <i class="fas fa-chevron-right ms-1" style="font-size: 0.7rem;"></i>
                                     </button>
                                 </td>
@@ -185,10 +185,10 @@
                                         <div class="position-relative me-3">
                                             <div class="rounded-circle d-flex align-items-center justify-content-center"
                                                 style="
-      width: 42px;
-      height: 42px;
-      background: linear-gradient(135deg, rgba(253, 121, 168, 0.1), rgba(253, 121, 168, 0.2));
-      ">
+                                                    width: 42px;
+                                                    height: 42px;
+                                                    background: linear-gradient(135deg, rgba(253, 121, 168, 0.1), rgba(253, 121, 168, 0.2));
+                                                    ">
                                                 <i class="fas fa-user-md" style="color: #fd79a8;"></i>
                                             </div>
                                         </div>
@@ -201,10 +201,10 @@
                                 <td class="py-3">
                                     <span class="badge rounded-pill py-2 px-3"
                                         style="
-      background: rgba(253, 121, 168, 0.1);
-      color: #fd79a8;
-      font-weight: 500;
-      ">
+                                            background: rgba(253, 121, 168, 0.1);
+                                            color: #fd79a8;
+                                            font-weight: 500;
+                                            ">
                                         Neurology
                                     </span>
                                 </td>
@@ -217,21 +217,21 @@
                                 <td class="py-3">
                                     <span class="badge rounded-pill py-2 px-3"
                                         style="
-      background: rgba(255, 165, 2, 0.1);
-      color: #ffa502;
-      font-weight: 500;
-      ">
+                                            background: rgba(255, 165, 2, 0.1);
+                                            color: #ffa502;
+                                            font-weight: 500;
+                                            ">
                                         <i class="fas fa-clock me-1"></i> Pending
                                     </span>
                                 </td>
                                 <td class="pe-4 py-3 text-end">
                                     <button class="btn btn-sm rounded-pill px-3 py-2"
                                         style="
-      background: rgba(253, 121, 168, 0.1);
-      color: #fd79a8;
-      border: none;
-      font-weight: 500;
-      ">
+                                            background: rgba(253, 121, 168, 0.1);
+                                            color: #fd79a8;
+                                            border: none;
+                                            font-weight: 500;
+                                            ">
                                         Details <i class="fas fa-chevron-right ms-1" style="font-size: 0.7rem;"></i>
                                     </button>
                                 </td>
@@ -244,10 +244,10 @@
             <div class="card-footer bg-transparent border-0 text-center py-3">
                 <a href="#" class="text-decoration-none"
                     style="
-    color: #6c5ce7;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    ">
+                        color: #6c5ce7;
+                        font-weight: 500;
+                        transition: all 0.2s ease;
+                        ">
                     View All Appointments <i class="fas fa-chevron-down ms-2"></i>
                 </a>
             </div>
@@ -258,7 +258,7 @@
             <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-4">
                 <div>
                     <h5 class="mb-0 text-primary fw-semibold">
-                        <i class="bi bi-prescription2 me-2"></i>Recent Prescriptions
+                        <i class="fa-solid fa-prescription-bottle-medical"></i> Recent Prescriptions
                     </h5>
                 </div>
                 <a href="#" class="btn btn-sm btn-primary rounded-pill px-4 hover-scale">

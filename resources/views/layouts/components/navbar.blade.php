@@ -85,7 +85,6 @@
                                         <p class="mb-0 small text-muted">
                                             {{ Str::limit($notification->message ?? '', 60) }}</p>
                                     </div>
-
                                     <!-- Unread indicator -->
                                     @if (!$notification->read_at)
                                         <span

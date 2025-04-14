@@ -14,6 +14,7 @@ use App\Http\Controllers\Patient\{
     PrescriptionController as PatientPrescriptionController,
     PaymentController as PatientPaymentController
 };
+
 use App\Http\Controllers\Doctor\{
     DashboardController as DoctorDashboardController,
     ProfileController as DoctorProfileController,
@@ -21,7 +22,6 @@ use App\Http\Controllers\Doctor\{
     PrescriptionController as DoctorPrescriptionController,
     PaymentLinkController as DoctorPaymentLinkController
 };
-
 
 Route::get('/', function () {
     return view('welcome');
@@ -38,8 +38,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-// ->middleware('auth')
-// ->name('logout');
+
+
 
 
 Route::controller(ForgotPasswordController::class)

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ResetPasswordController extends Controller
 {
@@ -43,6 +45,17 @@ class ResetPasswordController extends Controller
             'email.exists' => 'No account found with this email address.',
             'password.regex' => 'Password must be 8–15 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.',
         ]);
+
+        //Custom token expiry check (1 minute)
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$record || Carbon::parse($record->created_at)->addMinutes(1)->isPast()) {
+            return back()->withErrors([
+                'token' => 'This password reset link has expired. Please request a new one.',
+            ]);
+        }
 
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
