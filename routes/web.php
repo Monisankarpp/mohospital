@@ -66,6 +66,7 @@ Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(
         Route::post('/profile/update', 'update')->name('profile.update');
     });
     Route::get('/appointments', [PatientAppointmentController::class, 'index'])->name('appointments.book');
+    Route::get('/prescription/{id}', [PatientPrescriptionController::class, 'show'])->name('prescriptions.show');
     Route::get('/prescriptions', [PatientPrescriptionController::class, 'index'])->name('prescriptions');
     Route::get('/payments', [PatientPaymentController::class, 'index'])->name('payments');
 });
@@ -81,6 +82,8 @@ Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(fun
     });
     Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
     Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
+    Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
+
     Route::get('/send-payment-link', [DoctorPaymentLinkController::class, 'index'])->name('payment.link');
 });
 

@@ -1,6 +1,6 @@
 @extends('layouts.doctor-dashboard')
 
-@section('page-title', 'Doctor Dashboard')
+@section('title', 'Dashboard')
 
 @section('dashboard-content')
     <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
@@ -20,67 +20,66 @@
 
         <!-- Stats Cards -->
         <div class="row g-4 mb-4">
-            <!-- Today's Appointments Card -->
+            <!-- Upcoming Appointments Card -->
             <div class="col-md-6 col-lg-4">
-                <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #4e73df;">
+                <div class="card border-start border-primary border-4 shadow-sm h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
-                                <i class="fas fa-calendar-day text-primary fa-lg"></i>
-                            </div>
-                            <div>
-                                <h3 class="mb-0 fw-bold">8</h3>
-                                <small class="text-muted">Today's Appointments</small>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <a href="#" class="btn btn-sm btn-outline-primary rounded-pill">
-                                View All <i class="fas fa-chevron-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pending Prescriptions Card -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #1cc88a;">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
-                                <i class="fa-solid fa-clock text-success fa-lg"></i>
-                                {{-- <i class="fas fa-prescription text-success fa-lg"></i> --}}
+                                <i class="fa-solid fa-calendar text-primary fa-xl"></i>
                             </div>
                             <div>
                                 <h3 class="mb-0 fw-bold">5</h3>
-                                <small class="text-muted">Pending Prescriptions</small>
+                                <small class="text-muted">Upcoming Appointments</small>
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a href="#" class="btn btn-sm btn-outline-success rounded-pill">
-                                View All <i class="fas fa-chevron-right ms-1"></i>
+                            <a href="" class="btn btn-sm btn-outline-primary rounded-pill">
+                                View All <i class="fa-solid fa-chevron-right ms-1"></i>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Patient Messages Card -->
+            <!-- Prescriptions Card -->
             <div class="col-md-6 col-lg-4">
-                <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #f6c23e;">
+                <div class="card border-start border-success border-4 shadow-sm h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
-                            <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
-                                <i class="fas fa-comments text-warning fa-lg"></i>
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="fa-solid fa-file-medical text-success fa-xl"></i>
                             </div>
                             <div>
                                 <h3 class="mb-0 fw-bold">3</h3>
-                                <small class="text-muted">Unread Messages</small>
+                                <small class="text-muted">Active Prescriptions</small>
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a href="#" class="btn btn-sm btn-outline-warning rounded-pill">
-                                View All <i class="fas fa-chevron-right ms-1"></i>
+                            <a href="" class="btn btn-sm btn-outline-success rounded-pill">
+                                View All <i class="fa-solid fa-chevron-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Payments Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-start border-warning border-4 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                                <i class="fa-solid fa-sack-dollar text-warning fa-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0 fw-bold">2</h3>
+                                <small class="text-muted">Pending Payments</small>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="" class="btn btn-sm btn-outline-warning rounded-pill">
+                                View All <i class="fa-solid fa-chevron-right ms-1"></i>
                             </a>
                         </div>
                     </div>

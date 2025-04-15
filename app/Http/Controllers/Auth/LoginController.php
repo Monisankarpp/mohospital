@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Services\Auth\LoginService;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\View\View;
@@ -33,7 +34,7 @@ class LoginController extends Controller
 
         // Check if already locked out
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
-            $secondsRemaining = RateLimiter::availableIn($key);
+            $secondsRemaining = RateLimiter::availableIn(key: $key);
             return back()
                 ->withErrors([
                     'email' => "Too many login attempts.",
@@ -47,7 +48,7 @@ class LoginController extends Controller
         $remember = $request->filled('remember');
 
         if (strlen($credentials['password']) < 8) {
-            return back()
+            return redirect()->back()
                 ->withErrors(['password' => 'Password must be at least 8 characters.'])
                 ->with('attempts_left', $maxAttempts - RateLimiter::attempts($key))
                 ->withInput();

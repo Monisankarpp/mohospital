@@ -1,6 +1,6 @@
 @extends('layouts.base')
 
-@section('title', 'Patient Dashboard')
+@section('title', 'Doctor Dashboard')
 
 @section('header')
     <div class="d-flex justify-content-between align-items-center mb-4 ">

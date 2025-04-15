@@ -1,6 +1,6 @@
 @extends('layouts.patient-dashboard')
 
-@section('page-title', 'Profile')
+@section('title', 'Profile')
 
 @section('dashboard-content')
     <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">

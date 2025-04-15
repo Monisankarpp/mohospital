@@ -29,6 +29,7 @@ class PatientProfileService
     // Update the user details
     $user->name = $request->name;
     $user->phone = $request->phone;
+    $user->address = $request->address;
     $user->save();
   }
 }

@@ -10,4 +10,5 @@ class PrescriptionController extends Controller
   {
     return view('patient.prescriptions');
   }
+
 }
