@@ -8,22 +8,36 @@ use Illuminate\Validation\ValidationException;
 
 class DoctorProfileService
 {
-  public function update(array $data): void
-  {
-    $user = Auth::user();
+	public function update(array $data): void
+	{
+		$user = Auth::user();
 
-    if (!empty($data['password'])) {
-      if (!Hash::check($data['current_password'], $user->password)) {
-        throw ValidationException::withMessages([
-          'current_password' => 'The current password is incorrect.',
-        ]);
-      }
+		// Update user fields
+		$user->update([
+			'name' => $data['name'],
+			'phone' => $data['phone'],
+			'address' => $data['address'],
+		]);
 
-      $user->password = Hash::make($data['password']);
-    }
+		// Check if doctor record exists
+		if ($user->doctor) {
+			$user->doctor->update([
+				'specialization' => $data['specialization'] ?? $user->doctor->specialization,
+				'status' => isset($data['status']) ? $data['status'] : $user->doctor->status,
+			]);
+		} else {
+			// Create doctor record if it doesn't exist
+			$user->doctor()->create([
+				'specialization' => $data['specialization'] ?? '',
+				'status' => isset($data['status']),
+			]);
+		}
 
-    $user->name = $data['name'];
-    $user->phone = $data['phone'];
-    $user->save();
-  }
+		if (!empty($data['password'])) {
+			$user->update([
+				'password' => bcrypt($data['password']),
+			]);
+		}
+	}
+
 }

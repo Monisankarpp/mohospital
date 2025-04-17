@@ -24,6 +24,9 @@ class UpdateProfileRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\s\(\)]+$/'],
+            'address' => ['required', 'string', 'max:255'],
+            'specialization' => ['required', 'string', 'max:255'],
+            'status' => ['nullable'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'current_password' => ['required_with:password'],
         ];

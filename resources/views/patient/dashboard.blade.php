@@ -4,73 +4,6 @@
 
 @section('dashboard-content')
     <div class="container-fluid py-4 ps-lg-5 " style="margin-left: 250px; max-width: calc(100% - 250px);">
-        <div class="row g-4 mb-4">
-            <!-- Upcoming Appointments Card -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card border-start border-primary border-4 shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
-                                <i class="fa-solid fa-calendar text-primary fa-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="mb-0 fw-bold">5</h3>
-                                <small class="text-muted">Upcoming Appointments</small>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <a href="" class="btn btn-sm btn-outline-primary rounded-pill">
-                                View All <i class="fa-solid fa-chevron-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Prescriptions Card -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card border-start border-success border-4 shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
-                                <i class="fa-solid fa-file-medical text-success fa-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="mb-0 fw-bold">3</h3>
-                                <small class="text-muted">Active Prescriptions</small>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <a href="" class="btn btn-sm btn-outline-success rounded-pill">
-                                View All <i class="fa-solid fa-chevron-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pending Payments Card -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card border-start border-warning border-4 shadow-sm h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
-                                <i class="fa-solid fa-sack-dollar text-warning fa-xl"></i>
-                            </div>
-                            <div>
-                                <h3 class="mb-0 fw-bold">2</h3>
-                                <small class="text-muted">Pending Payments</small>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <a href="" class="btn btn-sm btn-outline-warning rounded-pill">
-                                View All <i class="fa-solid fa-chevron-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Upcoming Appointments Section -->
         <div class="card mb-4 border-0"
@@ -254,93 +187,105 @@
         </div>
 
         <!-- Recent Prescriptions Table - Enhanced UI -->
-        <div class="card shadow-sm border-0 overflow-hidden">
-            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 pb-2 px-4">
+        <div class="card border-0"
+            style="border-radius: 16px; background: linear-gradient(135deg, #f8fbfe 0%, #f0f7ff 100%); box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15);">
+            <!-- Card Header with View All Button -->
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center p-4 pb-0">
                 <div>
-                    <h5 class="mb-0 text-primary fw-semibold">
-                        <i class="fa-solid fa-prescription-bottle-medical"></i> Recent Prescriptions
-                    </h5>
+                    <span class="badge rounded-pill px-3 py-2 mb-2"
+                        style="background: rgba(25, 118, 210, 0.1); color: #1976d2; font-size: 12px;">
+                        <i class="fas fa-prescription-bottle-alt me-2"></i>ACTIVE PRESCRIPTION
+                    </span>
+                    <h3 class="mb-0" style="color: #2d3748; font-weight: 600;">Current Medication Plan</h3>
                 </div>
-                <a href="#" class="btn btn-sm btn-primary rounded-pill px-4 hover-scale">
-                    <i class="bi bi-list-ul me-1"></i>View All
+                <a href="{{ route('patient.prescriptions') }}" class="btn btn-sm rounded-pill px-4 py-2 hover-scale"
+                    style="background: #1976d2; color: white; box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);">
+                    <i class="fas fa-list-ul me-2"></i>View All Prescriptions
                 </a>
             </div>
 
-            <div class="card-body px-0 pt-0">
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light sticky-top" style="top: -1px;">
-                            <tr>
-                                <th class="ps-4 py-3 text-uppercase fw-semibold text-muted small">Doctor</th>
-                                <th class="py-3 text-uppercase fw-semibold text-muted small">Date</th>
-                                <th class="py-3 text-uppercase fw-semibold text-muted small">Medications</th>
-                                <th class="pe-4 py-3 text-uppercase fw-semibold text-muted small text-end">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Prescription Row 1 -->
-                            <tr class="border-top-0 border-bottom">
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://via.placeholder.com/40" class="rounded-circle me-3"
-                                            width="40" height="40" alt="Dr. Sarah Johnson">
-                                        <div>
-                                            <h6 class="mb-0 fw-semibold">Dr. Sarah Johnson</h6>
-                                            <small class="text-muted">Cardiology</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3">
-                                    <span class="text-dark">10 Jun, 2023</span>
-                                </td>
-                                <td class="py-3">
-                                    <span class="badge bg-light text-primary rounded-pill px-3 py-1">3 medications</span>
-                                </td>
-                                <td class="pe-4 py-3 text-end">
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2 hover-scale">
-                                        <i class="bi bi-eye me-1"></i>View
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-success rounded-pill px-3 hover-scale">
-                                        <i class="bi bi-download me-1"></i>Download
-                                    </button>
-                                </td>
-                            </tr>
+            <div class="card-body p-4 pt-2">
+                <!-- Doctor Info Section -->
+                <div class="d-flex align-items-center mb-4 p-3"
+                    style="background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                    <div
+                        style="width: 40px; height: 40px; background: #e8f0fe; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                        <i class="fas fa-user-md" style="font-size: 18px; color: #4a6cf7;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1" style="color: #2d3748; font-weight: 600;">Dr. Sarah Johnson</h5>
+                        <p class="mb-1" style="color: #718096; font-size: 14px;">Cardiology Specialist</p>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-calendar-alt me-2" style="color: #718096; font-size: 12px;"></i>
+                            <span style="color: #4a5568; font-size: 13px; font-weight: 500;">Last Updated: June 10,
+                                2023</span>
+                        </div>
+                    </div>
+                </div>
 
-                            <!-- Prescription Row 2 -->
-                            <tr class="border-bottom">
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://via.placeholder.com/40/e3f2fd/1976d2"
-                                            class="rounded-circle me-3" width="40" height="40"
-                                            alt="Dr. Michael Chen">
-                                        <div>
-                                            <h6 class="mb-0 fw-semibold">Dr. Michael Chen</h6>
-                                            <small class="text-muted">Neurology</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3">
-                                    <span class="text-dark">5 Jun, 2023</span>
-                                </td>
-                                <td class="py-3">
-                                    <span class="badge bg-light text-primary rounded-pill px-3 py-1">2 medications</span>
-                                </td>
-                                <td class="pe-4 py-3 text-end">
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2 hover-scale">
-                                        <i class="bi bi-eye me-1"></i>View
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-success rounded-pill px-3 hover-scale">
-                                        <i class="bi bi-download me-1"></i>Download
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Medications List -->
+                <div class="mb-4">
+                    <h6 class="mb-3" style="color: #4a5568; font-weight: 600; font-size: 15px;">
+                        <i class="fas fa-pills me-2" style="color: #1976d2;"></i>PRESCRIBED MEDICATIONS
+                    </h6>
+
+                    <div class="row g-3">
+                        <!-- Medication 1 -->
+                        <div class="col-md-6">
+                            <div class="p-3 d-flex align-items-center"
+                                style="background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                                <div class="me-3"
+                                    style="width: 36px; height: 36px; background: rgba(25, 118, 210, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid fa-pills" style="color: #1976d2;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0" style="color: #2d3748; font-size: 14px; font-weight: 600;">
+                                        Atorvastatin</h6>
+                                    <p class="mb-0" style="color: #718096; font-size: 13px;">20mg · Once daily · Oral
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medication 2 -->
+                        <div class="col-md-6">
+                            <div class="p-3 d-flex align-items-center"
+                                style="background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                                <div class="me-3"
+                                    style="width: 36px; height: 36px; background: rgba(25, 118, 210, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid fa-pills" style="color: #1976d2;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0" style="color: #2d3748; font-size: 14px; font-weight: 600;">
+                                        Metoprolol</h6>
+                                    <p class="mb-0" style="color: #718096; font-size: 13px;">50mg · Twice daily · Oral
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                    <div>
+                        <i class="fas fa-info-circle me-2" style="color: #718096;"></i>
+                        <span style="color: #718096; font-size: 13px;">Valid until: <strong style="color: #4a5568;">Dec
+                                15, 2023</strong></span>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm rounded-pill px-4 py-2 me-2 hover-scale"
+                            style="background: white; color: #1976d2; border: 1px solid #e2e8f0;">
+                            <i class="fas fa-eye me-2"></i>View Details
+                        </button>
+                        <button class="btn btn-sm rounded-pill px-4 py-2 hover-scale"
+                            style="background: #1976d2; color: white; box-shadow: 0 4px 12px rgba(25, 118, 210, 0.25);">
+                            <i class="fas fa-download me-2"></i>Download PDF
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-
-
 
     </div>
 @endsection

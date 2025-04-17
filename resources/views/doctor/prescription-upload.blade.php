@@ -50,6 +50,8 @@
                             <i class="fas fa-file-medical me-2" style="color: #27ae60;"></i>
                             Prescription Details
                         </label>
+
+                        {{-- Toolbar --}}
                         <div id="editor-toolbar" class="border rounded-top-3 p-2 bg-white">
                             <div class="btn-group btn-group-sm" role="group">
                                 <button type="button" class="btn btn-outline-secondary" data-command="bold" title="Bold">
@@ -73,14 +75,23 @@
                                 </button>
                             </div>
                         </div>
+
+                        {{-- Editable Content Area --}}
                         <div id="editor" class="form-control prescription-editor border-top-0 rounded-bottom-3"
                             contenteditable="true"
-                            placeholder="Enter detailed prescription including medicines, dosage, frequency, duration, and any special instructions...">
+                            placeholder="Enter each medicine in format: Name | Dosage | Frequency | Duration">
                         </div>
+
+                        {{-- Hidden Fields --}}
                         <textarea name="notes" id="notes" class="d-none" required></textarea>
+                        <textarea name="medications" id="medications" class="d-none"></textarea>
+
+                        {{-- Helper and Character Count --}}
                         <div class="d-flex justify-content-between mt-1">
-                            <div class="form-text text-muted small">Example: <em>Paracetamol 500mg - 1 tablet every 6 hours
-                                    for 3 days</em></div>
+                            <div class="form-text text-muted small">
+                                Format: <strong>Paracetamol 500mg | 1 tablet | Every 6 hours | 3 days</strong><br>
+                                Add one medicine per line.
+                            </div>
                             <div id="charCount" class="text-muted small">0/2000 characters</div>
                         </div>
                     </div>
@@ -366,5 +377,60 @@
             localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
             console.log('Auto-saved draft');
         }, 30000);
+
+
+        // demo
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('editor');
+            const medicationsField = document.getElementById('medications');
+            const notesField = document.getElementById('notes');
+            const charCount = document.getElementById('charCount');
+            const toolbarButtons = document.querySelectorAll('[data-command]');
+
+            // Toolbar functionality
+            toolbarButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const command = button.getAttribute('data-command');
+                    if (command === 'createLink') {
+                        const url = prompt('Enter the link here: ', 'http://');
+                        if (url) document.execCommand(command, false, url);
+                    } else {
+                        document.execCommand(command, false, null);
+                    }
+                });
+            });
+
+            // Update hidden fields before form submission
+            const form = editor.closest('form');
+            form.addEventListener('submit', function(e) {
+                // Capture raw HTML for notes
+                notesField.value = editor.innerHTML.trim();
+
+                // Parse into structured JSON array
+                const lines = editor.innerText.trim().split('\n');
+                const parsed = [];
+
+                lines.forEach(line => {
+                    const parts = line.split('|').map(p => p.trim());
+                    if (parts.length >= 4) {
+                        parsed.push({
+                            name: parts[0],
+                            dosage: parts[1],
+                            frequency: parts[2],
+                            duration: parseInt(parts[3]) || 0,
+                            composition: null // optional, could be added later
+                        });
+                    }
+                });
+
+                medicationsField.value = JSON.stringify(parsed);
+            });
+
+            // Char count
+            editor.addEventListener('input', function() {
+                charCount.textContent = `${editor.innerText.length}/2000 characters`;
+            });
+        });
     </script>
+
 @endsection

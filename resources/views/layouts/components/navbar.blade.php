@@ -62,10 +62,12 @@
 
                     <!-- Notification items container with scroll -->
                     <div style="max-height: 400px; overflow-y: auto; background-color: #f8f9fa;">
-                        @forelse(auth()->user()->notifications()->latest()->take(7)->get() as $notification)
+                        @forelse(auth()->user()->notifications()->latest()->take(2)->get() as $notification)
                             <li class="border-bottom border-light">
-                                <a href="#"
-                                    class="dropdown-item d-flex py-3 px-3 position-relative notification-item">
+                                <a href="javascript:void(0);"
+                                    class="dropdown-item d-flex py-3 px-3 position-relative notification-item"
+                                    data-id="{{ $notification->id }}" data-title="{{ $notification->title }}"
+                                    data-message="{{ $notification->message }}">
                                     <!-- Colored icon badge based on notification type -->
                                     <div class="flex-shrink-0 me-3">
                                         <div class="notification-icon rounded-circle d-flex align-items-center justify-content-center"
@@ -103,6 +105,7 @@
                                 </div>
                             </li>
                         @endforelse
+
                     </div>
 
                     <!-- Footer with view all button -->
@@ -114,6 +117,27 @@
                     </li>
                 </ul>
             </li>
+
+            <!-- Modal for displaying full message -->
+            <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <h6 id="notificationTitle"></h6>
+                            <p id="notificationMessage"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Profile Dropdown -->
             <li class="nav-item dropdown ms-3">
@@ -203,3 +227,43 @@
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
     @csrf
 </form>
+<script>
+    $(document).ready(function() {
+        // When a notification is clicked
+        $('.notification-item').on('click', function() {
+            // Get the notification data
+            var notificationId = $(this).data('id');
+            var notificationTitle = $(this).data('title');
+            var notificationMessage = $(this).data('message');
+
+            // Set modal content
+            $('#notificationModalLabel').text(notificationTitle);
+            $('#notificationTitle').text(notificationTitle);
+            $('#notificationMessage').text(notificationMessage);
+
+            // Open the modal
+            $('#notificationModal').modal('show');
+
+            // Mark the notification as read after the modal is closed
+            $('#notificationModal').on('hidden.bs.modal', function() {
+                $.ajax({
+                    url: '/notifications/' + notificationId +
+                        '/read', // Adjust the URL according to your routes
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}' // CSRF token for security
+                    },
+                    success: function(response) {
+                        // Optionally update the notification badge or status
+                        // Example: Remove the unread indicator from the notification item
+                        $('li[data-id="' + notificationId + '"] .position-absolute')
+                            .remove();
+                    },
+                    error: function(error) {
+                        console.log('Error marking notification as read:', error);
+                    }
+                });
+            });
+        });
+    });
+</script>

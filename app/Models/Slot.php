@@ -22,9 +22,15 @@ class Slot extends Model
         return $this->belongsTo(DoctorDepartment::class);
     }
 
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
     public function appointment()
     {
         return $this->hasOne(Appointment::class);
     }
+
 }
 

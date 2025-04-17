@@ -95,7 +95,8 @@
                         <i class="fas fa-calendar-alt text-primary me-2"></i>Today's Schedule
                     </h5>
                     <div class="d-flex flex-wrap align-items-center gap-2">
-                        <a href="#" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+                        <a href="{{ route('doctor.slots.create') }}"
+                            class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
                             <i class="fas fa-plus-circle me-1"></i> Add Availability
                         </a>
                         <div class="btn-group" role="group">

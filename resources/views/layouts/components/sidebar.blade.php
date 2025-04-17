@@ -72,7 +72,7 @@
                 </li>
 
                 <li class="nav-item mb-2">
-                    <a href="{{ route('doctor.appointments') }}"
+                    <a href="{{ route('doctor.slots.index') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.appointments*') ? 'active' : 'text-white-50' }}">
                         <div class="icon-wrapper me-3 bg-info bg-opacity-10">
                             <i class="fas fa-calendar-alt text-info"></i>
@@ -89,17 +89,6 @@
                             <i class="fas fa-file-medical text-success"></i>
                         </div>
                         <span class="fw-medium">Prescriptions</span>
-                        <i class="fas fa-chevron-right ms-auto text-muted"></i>
-                    </a>
-                </li>
-
-                <li class="nav-item mb-2">
-                    <a href="{{ route('doctor.payment.link') }}"
-                        class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.send-payment-link*') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-purple bg-opacity-10">
-                            <i class="fas fa-link text-purple"></i>
-                        </div>
-                        <span class="fw-medium">Payment Links</span>
                         <i class="fas fa-chevron-right ms-auto text-muted"></i>
                     </a>
                 </li>

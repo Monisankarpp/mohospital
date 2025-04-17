@@ -31,5 +31,6 @@ class Prescription extends Model
     {
         return $this->hasMany(LabReport::class);
     }
+
 }
 

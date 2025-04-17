@@ -84,6 +84,48 @@
                             </div>
                         </div>
 
+                        <!-- Doctor Information -->
+                        <div class="col-lg-6">
+                            <div class="p-4 rounded-3 h-100" style="background-color: #f8f9fa;">
+                                <h5 class="mb-4 text-primary">
+                                    <i class="fa-solid fa-user-doctor"></i> Doctor Information
+                                </h5>
+
+                                <div class="mb-4">
+                                    <label for="specialization" class="form-label text-muted">Specialization</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-primary bg-opacity-10 text-primary">
+                                            <i class="fa-solid fa-stethoscope"></i>
+                                        </span>
+                                        <input type="text" id="specialization" name="specialization"
+                                            value="{{ old('specialization', auth()->user()->doctor->specialization ?? '') }}"
+                                            class="form-control @error('specialization') is-invalid @enderror" required>
+                                    </div>
+                                    @error('specialization')
+                                        <div class="text-danger small mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="status" class="form-label text-muted">Status</label>
+
+                                    <!-- Hidden input to send 0 if the checkbox is not checked -->
+                                    <input type="hidden" name="status" value="0">
+
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="status"
+                                            name="status" value="1"
+                                            {{ old('status', auth()->user()->doctor->status ?? false) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="status">
+                                            {{ old('status', auth()->user()->doctor->status ?? false) ? 'Active' : 'Inactive' }}
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
                         <!-- Password Update -->
                         <div class="col-lg-6">
                             <div class="p-4 rounded-3 h-100" style="background-color: #f8f9fa;">

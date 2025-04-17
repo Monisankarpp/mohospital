@@ -6,6 +6,11 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\PaymentController;
+
 
 use App\Http\Controllers\Patient\{
     DashboardController as PatientDashboardController,
@@ -20,7 +25,7 @@ use App\Http\Controllers\Doctor\{
     ProfileController as DoctorProfileController,
     AppointmentController as DoctorAppointmentController,
     PrescriptionController as DoctorPrescriptionController,
-    PaymentLinkController as DoctorPaymentLinkController
+    SlotController,
 };
 
 Route::get('/', function () {
@@ -83,8 +88,14 @@ Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(fun
     Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
     Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
     Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
-
-    Route::get('/send-payment-link', [DoctorPaymentLinkController::class, 'index'])->name('payment.link');
+    Route::resource('slots', SlotController::class);
 });
+
+Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+
+Route::get('/generate-invoice/{id}', [InvoiceController::class, 'generatePDF'])->name('generate.invoice');
+
+Route::get('/invoice/view/{id}', [InvoiceController::class, 'view'])->name('invoices.show');
+
 
 
