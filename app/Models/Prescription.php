@@ -27,10 +27,10 @@ class Prescription extends Model
         return $this->belongsTo(User::class, 'patient_id');
     }
 
-    public function labReports()
-    {
-        return $this->hasMany(LabReport::class);
-    }
+    // public function labReports()
+    // {
+    //     return $this->hasMany(LabReport::class);
+    // }
 
 }
 

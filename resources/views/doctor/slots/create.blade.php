@@ -17,21 +17,6 @@
                             @method('PUT')
                         @endif
 
-                        <!-- Department Selection -->
-                        <div class="mb-4">
-                            <label for="department" class="form-label text-muted mb-2">Department</label>
-                            <select name="doctor_department_id" id="department"
-                                class="form-select form-select-lg shadow-sm rounded-3" required>
-                                <option value="">Select Department</option>
-                                @foreach ($departments as $dept)
-                                    <option value="{{ $dept->id }}"
-                                        {{ old('doctor_department_id', $slot->doctor_department_id ?? '') == $dept->id ? 'selected' : '' }}>
-                                        {{ $dept->specialization ?? 'N/A' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
                         <!-- Time Selection -->
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
@@ -42,7 +27,7 @@
                                     </span>
                                     <input type="datetime-local" id="start_time" name="start_time"
                                         class="form-control form-control-lg rounded-end shadow-sm"
-                                        value="{{ old('start_time', isset($slot) ? $slot->start_time->format('Y-m-d\TH:i') : '') }}"
+                                        value="{{ old('start_time', isset($slot) ? \Carbon\Carbon::parse($slot->start_time)->format('Y-m-d\TH:i') : '') }}"
                                         required>
                                 </div>
                             </div>
@@ -54,11 +39,14 @@
                                     </span>
                                     <input type="datetime-local" id="end_time" name="end_time"
                                         class="form-control form-control-lg rounded-end shadow-sm"
-                                        value="{{ old('end_time', isset($slot) ? $slot->end_time->format('Y-m-d\TH:i') : '') }}"
+                                        value="{{ old('end_time', isset($slot) ? \Carbon\Carbon::parse($slot->end_time)->format('Y-m-d\TH:i') : '') }}"
                                         required>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Hidden Doctor Info -->
+                        <input type="hidden" name="doctor_id" value="{{ auth()->user()->doctor->id }}">
 
                         <!-- Form Actions -->
                         <div class="d-flex justify-content-end gap-4 mt-5">

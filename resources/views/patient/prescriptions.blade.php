@@ -44,8 +44,8 @@
                                                 <i class="fas fa-user-md"></i>
                                             </div>
                                             <div>
-                                                <h6 class="mb-0 fw-semibold">{{ $prescription->doctor_name }}</h6>
-                                                <small class="text-muted">{{ $prescription->hospital_name }}</small>
+                                                <h6 class="mb-0 fw-semibold">{{ $prescription->doctor->user->name }}</h6>
+                                                <small class="text-muted">{{ 'Main Hospital' }}</small>
                                             </div>
                                         </div>
                                     </td>
@@ -62,10 +62,10 @@
                                     </td>
                                     <td class="py-3">
                                         <span
-                                            class="badge bg-soft-{{ $prescription->status == 'Active' ? 'success' : 'warning' }} text-{{ $prescription->status == 'Active' ? 'success' : 'warning' }} rounded-pill px-3 py-1">
+                                            class="badge bg-soft-{{ 'Active' == 'Active' ? 'success' : 'warning' }} text-{{ 'Active' == 'Active' ? 'success' : 'warning' }} rounded-pill px-3 py-1">
                                             <i
-                                                class="fas fa-{{ $prescription->status == 'Active' ? 'check-circle' : 'clock' }} me-1"></i>
-                                            {{ $prescription->status }}
+                                                class="fas fa-{{ 'Active' == 'Active' ? 'check-circle' : 'clock' }} me-1"></i>
+                                            {{ 'success' }}
                                         </span>
                                     </td>
                                     <td class="pe-4 py-3 text-end">
@@ -97,8 +97,7 @@
                         Showing <span class="fw-semibold">{{ count($prescriptions) }}</span> of <span
                             class="fw-semibold">{{ $prescriptions->count() }}</span> prescriptions
                     </div>
-                    <!-- Pagination (if required) -->
-                    <!-- Add pagination logic here if needed -->
+                    <!-- pagination  -->
                 </div>
             </div>
         </div>

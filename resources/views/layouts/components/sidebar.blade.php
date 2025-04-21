@@ -17,15 +17,28 @@
         <ul class="nav flex-column mb-auto px-3" style="overflow-y: auto; overflow-x: hidden;">
             @if (auth()->user()->role == 'patient')
                 <li class="nav-item mb-2">
-                    <a href="{{ route('patient.dashboard') }}"
-                        class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('patient.dashboard') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-primary bg-opacity-10">
-                            <i class="fas fa-home text-primary"></i>
+                    <a href="/"
+                        class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('home') ? 'active' : 'text-white-50' }}">
+                        <div class="icon-wrapper me-3 bg-success bg-opacity-10 rounded-circle p-2">
+                            <i class="fas fa-house-user text-success fs-5"></i>
                         </div>
-                        <span class="fw-medium">Dashboard</span>
+                        <span class="fw-semibold">Home</span>
+                        <span class="badge bg-info text-dark ms-2">New</span>
                         <i class="fas fa-chevron-right ms-auto text-muted"></i>
                     </a>
                 </li>
+
+                <li class="nav-item mb-2">
+                    <a href="{{ route('patient.dashboard') }}"
+                        class="nav-link rounded-start px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('patient.dashboard') ? 'active' : 'text-white-50' }}">
+                        <div class="icon-wrapper me-3 bg-info bg-opacity-10 rounded-2 p-2">
+                            <i class="fas fa-tachometer-alt text-info fs-5"></i>
+                        </div>
+                        <span class="fw-semibold">Dashboard</span>
+                        <i class="fas fa-angle-double-right ms-auto text-muted"></i>
+                    </a>
+                </li>
+
 
                 <li class="nav-item mb-2">
                     <a href="{{ route('patient.appointments.book') }}"

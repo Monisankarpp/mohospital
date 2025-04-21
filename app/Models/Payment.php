@@ -36,9 +36,9 @@ class Payment extends Model
         return $this->belongsTo(Appointment::class);
     }
 
-    public function medicineOrder()
-    {
-        return $this->belongsTo(MedicineOrder::class, 'order_id');
-    }
+    // public function medicineOrder()
+    // {
+    //     return $this->belongsTo(MedicineOrder::class, 'order_id');
+    // }
 
 }

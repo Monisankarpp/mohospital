@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        <!-- Today's Schedule - USA Client Grade UI -->
+        <!-- Today's Schedule -->
         <div class="card border-0 shadow-sm mb-4 rounded-4">
             <div class="card-header bg-white border-0 py-4 px-4 rounded-top-4 shadow-sm">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">

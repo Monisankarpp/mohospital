@@ -38,20 +38,20 @@ class User extends Authenticatable
     ];
 
 
-    public function hospital()
-    {
-        return $this->hasOne(Hospital::class);
-    }
+    // public function hospital()
+    // {
+    //     return $this->hasOne(Hospital::class);
+    // }
 
     public function doctor()
     {
         return $this->hasOne(Doctor::class);
     }
 
-    public function medicalStore()
-    {
-        return $this->hasOne(MedicalStore::class);
-    }
+    // public function medicalStore()
+    // {
+    //     return $this->hasOne(MedicalStore::class);
+    // }
 
     public function appointments()
     {
@@ -68,20 +68,20 @@ class User extends Authenticatable
         return $this->hasMany(Prescription::class, 'patient_id');
     }
 
-    public function labReports()
-    {
-        return $this->hasMany(LabReport::class);
-    }
+    // public function labReports()
+    // {
+    //     return $this->hasMany(LabReport::class);
+    // }
 
     public function notifications()
     {
         return $this->hasMany(Notification::class);
     }
 
-    public function medicineOrders()
-    {
-        return $this->hasMany(MedicineOrder::class, 'patient_id');
-    }
+    // public function medicineOrders()
+    // {
+    //     return $this->hasMany(MedicineOrder::class, 'patient_id');
+    // }
 
     /**
      * Get the attributes that should be cast.

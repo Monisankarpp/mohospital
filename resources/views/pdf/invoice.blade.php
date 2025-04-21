@@ -169,7 +169,7 @@
         <div class="prescription-card">
             <div class="prescription-header" style="background-color: #4f81c7; color: white;">
                 <div class="watermark">Rx</div>
-                <h1 class="prescription-title">Medical Prescription</h1>
+                <h1 class="prescription-title"> Mo-Hospital Prescription</h1>
                 <p class="prescription-subtitle">Invoice #{{ $invoice_no }} • {{ $date }}</p>
             </div>
 

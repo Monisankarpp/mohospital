@@ -11,16 +11,16 @@ class Slot extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'doctor_department_id',
+        'doctor_id',
         'start_time',
         'end_time',
         'is_booked',
     ];
 
-    public function doctorDepartment()
-    {
-        return $this->belongsTo(DoctorDepartment::class);
-    }
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+    ];
 
     public function doctor()
     {

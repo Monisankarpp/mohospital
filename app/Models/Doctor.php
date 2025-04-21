@@ -17,16 +17,6 @@ class Doctor extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function doctorDepartments()
-    {
-        return $this->hasMany(DoctorDepartment::class);
-    }
-
-    public function prescriptions()
-    {
-        return $this->hasMany(Prescription::class);
-    }
-
     public function slots()
     {
         return $this->hasMany(Slot::class);
@@ -34,7 +24,12 @@ class Doctor extends Model
 
     public function appointments()
     {
-        return $this->hasMany(Appointment::class);
+        return $this->hasManyThrough(Appointment::class, Slot::class);
+    }
+
+    public function prescriptions()
+    {
+        return $this->hasMany(Prescription::class);
     }
 }
 

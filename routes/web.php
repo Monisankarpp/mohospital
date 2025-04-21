@@ -3,13 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\DoctorController;
 
 
 use App\Http\Controllers\Patient\{
@@ -71,6 +69,9 @@ Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(
         Route::post('/profile/update', 'update')->name('profile.update');
     });
     Route::get('/appointments', [PatientAppointmentController::class, 'index'])->name('appointments.book');
+    Route::get('/appointments/{id}', [PatientAppointmentController::class, 'show'])->name('appointments.show');
+
+
     Route::get('/prescription/{id}', [PatientPrescriptionController::class, 'show'])->name('prescriptions.show');
     Route::get('/prescriptions', [PatientPrescriptionController::class, 'index'])->name('prescriptions');
     Route::get('/payments', [PatientPaymentController::class, 'index'])->name('payments');
@@ -99,3 +100,12 @@ Route::get('/invoice/view/{id}', [InvoiceController::class, 'view'])->name('invo
 
 
 
+// Route::middleware(['auth'])->group(function () {
+Route::get('/', [DoctorController::class, 'index'])->name('doctors.index');
+// Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+// });
+
+Route::get('/get-available-dates/{doctor}', [App\Http\Controllers\DoctorController::class, 'getAvailableDates']);
+
+
+Route::post('/appointments/book', [DoctorController::class, 'book'])->name('appointments.book');

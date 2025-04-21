@@ -10,15 +10,16 @@ class PrescriptionController extends Controller
 {
   public function index()
   {
-    $prescriptions = Prescription::where('patient_id', auth()->id())->orderByDesc('created_at')->get();
+    $prescriptions = Prescription::with(['doctor.user'])
+      ->where('patient_id', auth()->id())->orderByDesc('created_at')->get();
 
     return view('patient.prescriptions', compact('prescriptions'));
   }
 
   public function showPrescription()
   {
-    // Fetch the latest prescription for the patient (assuming it's related to the authenticated user)
-    $latestPrescription = Prescription::where('user_id', auth()->id())
+    // Fetch the latest prescription for the patient 
+    $latestPrescription = Prescription::where('patient_id', auth()->id())
       ->orderBy('created_at', 'desc')
       ->first();
 
