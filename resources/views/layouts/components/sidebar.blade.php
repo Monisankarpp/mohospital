@@ -1,3 +1,9 @@
+{{-- @php
+    $doctor = auth()->user()->doctor;
+    $firstTime = $doctor && $doctor->schedules()->doesntExist();
+    // dd($firstTime);
+    $slotRoute = !$firstTime ? route('doctor.slots.first-time-setup') : route('doctor.slots.index');
+@endphp --}}
 <aside id="sidebar" class="d-none d-lg-block position-fixed h-100 shadow"
     style="top: 80px; width: 280px; z-index: 1030; background: linear-gradient(180deg, #2c3e50 0%, #1a1a2e 100%);">
 
@@ -85,10 +91,21 @@
                 </li>
 
                 <li class="nav-item mb-2">
-                    <a href="{{ route('doctor.slots.index') }}"
+                    <a href="{{ route('doctor.prescription.upload') }}"
+                        class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.prescription.upload') ? 'active' : 'text-white-50' }}">
+                        <div class="icon-wrapper me-3 bg-success bg-opacity-10">
+                            <i class="fas fa-file-medical text-success"></i>
+                        </div>
+                        <span class="fw-medium">Prescriptions</span>
+                        <i class="fas fa-chevron-right ms-auto text-muted"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-2">
+                    <a href="{{ route('doctor.appointments') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.appointments*') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-info bg-opacity-10">
-                            <i class="fas fa-calendar-alt text-info"></i>
+                        <div class="icon-wrapper me-3 bg-warning bg-opacity-10">
+                            <i class="fas fa-calendar-check text-warning"></i>
                         </div>
                         <span class="fw-medium">Appointments</span>
                         <i class="fas fa-chevron-right ms-auto text-muted"></i>
@@ -96,12 +113,23 @@
                 </li>
 
                 <li class="nav-item mb-2">
-                    <a href="{{ route('doctor.prescription.upload') }}"
-                        class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.prescription-upload*') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-success bg-opacity-10">
-                            <i class="fas fa-file-medical text-success"></i>
+                    <a href="{{ route('doctor.schedule.index') }}"
+                        class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.slots*') ? 'active' : 'text-white-50' }}">
+                        <div class="icon-wrapper me-3 bg-info bg-opacity-10">
+                            <i class="fas fa-clock text-info"></i>
                         </div>
-                        <span class="fw-medium">Prescriptions</span>
+                        <span class="fw-medium">Slots</span>
+                        <i class="fas fa-chevron-right ms-auto text-muted"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-2">
+                    <a href=""
+                        class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.patients*') ? 'active' : 'text-white-50' }}">
+                        <div class="icon-wrapper me-3 bg-danger bg-opacity-10">
+                            <i class="fas fa-user-injured text-danger"></i>
+                        </div>
+                        <span class="fw-medium">Patients</span>
                         <i class="fas fa-chevron-right ms-auto text-muted"></i>
                     </a>
                 </li>

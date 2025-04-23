@@ -11,12 +11,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('slots', function (Blueprint $table) {
-            if (Schema::hasColumn('slots', 'doctor_id')) {
-                $table->foreign('doctor_id')
-                    ->references('id')
-                    ->on('doctors')
-                    ->onDelete('cascade');
-            }
+            $table->dropForeign(['doctor_department_id']);
+            $table->dropColumn('doctor_department_id');
+            $table->boolean('is_auto_generated')->default(false);
+            $table->boolean('is_recurring')->default(false);
         });
     }
 
@@ -25,9 +23,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('slots', function (Blueprint $table) {
-            $table->dropForeign(['doctor_id']);
-            $table->dropColumn('doctor_id');
-        });
+        //
     }
 };

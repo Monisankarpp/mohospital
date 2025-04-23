@@ -24,6 +24,8 @@ use App\Http\Controllers\Doctor\{
     AppointmentController as DoctorAppointmentController,
     PrescriptionController as DoctorPrescriptionController,
     SlotController,
+    SlotSetupController,
+    ScheduleController,
 };
 
 Route::get('/', function () {
@@ -80,17 +82,42 @@ Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(
 // --------------------
 // Doctor Routes
 // --------------------
-Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
-    Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
-    Route::controller(DoctorProfileController::class)->group(function () {
-        Route::get('/profile', 'index')->name('profile');
-        Route::post('/profile/update', 'update')->name('profile.update');
+// Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
+//     Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
+//     Route::controller(DoctorProfileController::class)->group(function () {
+//         Route::get('/profile', 'index')->name('profile');
+//         Route::post('/profile/update', 'update')->name('profile.update');
+//     });
+//     Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
+//     Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
+//     Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
+//     // Route::resource('slots', SlotController::class);
+// });
+
+Route::middleware(['role:doctor'])
+    ->prefix('doctor')
+    ->name('doctor.')
+    ->group(function () {
+        Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
+
+        Route::controller(DoctorProfileController::class)->group(function () {
+            Route::get('/profile', 'index')->name('profile');
+            Route::post('/profile/update', 'update')->name('profile.update');
+        });
+
+        Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
+
+        Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
+        Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
+
+        // ✅ Register first-time-setup BEFORE slots resource
+        Route::get('/slots/first-time-setup', [SlotController::class, 'firstTimeSetup'])->name('slots.first-time-setup');
+        Route::post('/slots/first-time-setup', [SlotController::class, 'storeFirstTimeSetup'])->name('slots.store-first-time');
+
+        // ✅ Then register slots resource
+        Route::resource('slots', SlotController::class)->except(['show']);
     });
-    Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
-    Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
-    Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
-    Route::resource('slots', SlotController::class);
-});
+
 
 Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
@@ -109,3 +136,27 @@ Route::get('/get-available-dates/{doctor}', [App\Http\Controllers\DoctorControll
 
 
 Route::post('/appointments/book', [DoctorController::class, 'book'])->name('appointments.book');
+
+
+
+// routes/web.php
+Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
+    // First-time setup
+    Route::get('slots/setup', [SlotSetupController::class, 'create'])->name('slots.setup');
+    Route::post('slots/setup', [SlotSetupController::class, 'store'])->name('slots.store');
+
+    // Schedule management
+    Route::get('schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+    Route::get('slots/{slot}/edit', [ScheduleController::class, 'edit'])->name('slots.edit');
+    Route::put('slots/{slot}', [ScheduleController::class, 'update'])->name('slots.update');
+    Route::delete('slots/{slot}', [ScheduleController::class, 'destroy'])->name('slots.destroy');
+
+    // Schedule reuse confirmation
+    Route::post('schedule/confirm', [ScheduleController::class, 'confirmReuseSchedule'])
+        ->name('schedule.confirm');
+});
+
+// Add this to your auth middleware if you want to check first login
+Route::middleware(['doctor.first.login'])->group(function () {
+    Route::view('/doctor/first-login', 'doctor.first-login');
+});

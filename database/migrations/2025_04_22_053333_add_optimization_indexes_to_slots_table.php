@@ -11,12 +11,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('slots', function (Blueprint $table) {
-            if (Schema::hasColumn('slots', 'doctor_id')) {
-                $table->foreign('doctor_id')
-                    ->references('id')
-                    ->on('doctors')
-                    ->onDelete('cascade');
-            }
+            $table->index(['doctor_id', 'start_time', 'is_booked']);
+            $table->index(['is_auto_generated', 'start_time']);
         });
     }
 
@@ -26,8 +22,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('slots', function (Blueprint $table) {
-            $table->dropForeign(['doctor_id']);
-            $table->dropColumn('doctor_id');
+            $table->index(['doctor_id', 'day', 'is_active']);
         });
     }
 };

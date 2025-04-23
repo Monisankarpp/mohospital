@@ -29,7 +29,7 @@ class AppointmentController extends Controller
         Appointment::create([
             'slot_id' => $slot->id,
             'doctor_id' => $request->doctor_id,
-            'user_id' => auth()->id(), // assuming logged in patient
+            'user_id' => auth()->id(),
             'appointment_date' => $request->appointment_date,
             'time_slot' => $request->time_slot,
             'reason' => $request->reason,

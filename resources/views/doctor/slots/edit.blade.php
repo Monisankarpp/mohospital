@@ -1,91 +1,89 @@
 @extends('layouts.doctor-dashboard')
 
-@section('title', 'Edit Slot')
+@section('title', 'Edit Appointment Slot')
 
 @section('content')
-    <div class="container-fluid py-5 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
-        <div class="container mt-4">
-            <div class="card border-0 shadow-lg rounded-4">
-                <div class="card-header bg-gradient text-white" style="background: #4a6cf7; border-radius: 10px 10px 0 0;">
-                    <h3 class="mb-0">Edit Time Slot</h3>
+    <div class="container-fluid py-5 px-4" style="margin-left: 250px; max-width: calc(100% - 250px);">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-primary">Edit Appointment Slot</h2>
+                <a href="{{ route('doctor.schedule.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Schedule
+                </a>
+            </div>
+
+            <!-- Card -->
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-light border-bottom py-3">
+                    <h5 class="mb-0 fw-semibold text-dark">
+                        Editing Slot for {{ $slot->start_time->format('l, M d, Y') }}
+                    </h5>
                 </div>
-                <div class="card-body p-5 bg-light rounded-bottom">
-                    <form action="{{ route('doctor.slots.update', $slot->id) }}" method="POST">
+
+                <div class="card-body p-4">
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('doctor.slots.update', $slot) }}" class="needs-validation"
+                        novalidate>
                         @csrf
                         @method('PUT')
 
-                        <!-- Time Selection -->
-                        <div class="row g-4 mb-4">
+                        <!-- Start Time -->
+                        <div class="mb-4 row">
+                            <label for="start_time" class="col-md-3 col-form-label fw-semibold text-end">Start Time</label>
                             <div class="col-md-6">
-                                <label for="start_time" class="form-label text-muted mb-2">Start Time</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-primary text-white border-end-0">
-                                        <i class="far fa-calendar-alt"></i>
-                                    </span>
-                                    <input type="datetime-local" id="start_time" name="start_time"
-                                        class="form-control form-control-lg rounded-end shadow-sm"
-                                        value="{{ old('start_time', \Carbon\Carbon::parse($slot->start_time)->format('Y-m-d\TH:i')) }}"
-                                        required>
-                                </div>
-                                @error('start_time')
-                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="end_time" class="form-label text-muted mb-2">End Time</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-danger text-white border-end-0">
-                                        <i class="far fa-clock"></i>
-                                    </span>
-                                    <input type="datetime-local" id="end_time" name="end_time"
-                                        class="form-control form-control-lg rounded-end shadow-sm"
-                                        value="{{ old('end_time', \Carbon\Carbon::parse($slot->end_time)->format('Y-m-d\TH:i')) }}"
-                                        required>
-                                </div>
-                                @error('end_time')
-                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Slot Booking Status -->
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label text-muted mb-2">Booking Status</label>
-                                <div class="form-control-lg p-2 bg-white rounded shadow-sm">
-                                    @if ($slot->is_booked)
-                                        <span class="badge bg-danger px-3 py-2">
-                                            <i class="fas fa-calendar-check me-1"></i> Booked
-                                        </span>
-                                        <small class="text-muted ms-2">This slot has been booked and cannot be
-                                            modified</small>
-                                    @else
-                                        <span class="badge bg-success px-3 py-2">
-                                            <i class="fas fa-calendar-alt me-1"></i> Available
-                                        </span>
-                                        <small class="text-muted ms-2">This slot is available for booking</small>
-                                    @endif
+                                    <span class="input-group-text text-primary bg-light"><i class="fas fa-clock"></i></span>
+                                    <input type="time" class="form-control @error('start_time') is-invalid @enderror"
+                                        id="start_time" name="start_time"
+                                        value="{{ old('start_time', $slot->start_time->format('H:i')) }}" required>
+                                    @error('start_time')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Hidden fields -->
-                        <input type="hidden" name="doctor_id" value="{{ $slot->doctor_id }}">
+                        <!-- End Time -->
+                        <div class="mb-4 row">
+                            <label for="end_time" class="col-md-3 col-form-label fw-semibold text-end">End Time</label>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text text-primary bg-light"><i class="fas fa-clock"></i></span>
+                                    <input type="time" class="form-control @error('end_time') is-invalid @enderror"
+                                        id="end_time" name="end_time"
+                                        value="{{ old('end_time', $slot->end_time->format('H:i')) }}" required>
+                                    @error('end_time')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
 
-                        <!-- Form Actions -->
-                        <div class="d-flex justify-content-end gap-4 mt-5">
-                            <a href="{{ route('doctor.slots.index') }}" class="btn btn-outline-secondary px-5 rounded-pill">
-                                <i class="fas fa-times me-2"></i> Cancel
-                            </a>
-                            @if (!$slot->is_booked)
-                                <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">
-                                    <i class="fas fa-save me-2"></i> Update Slot
+                        <!-- Submit -->
+                        <div class="row">
+                            <div class="col-md-6 offset-md-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                    <i class="fas fa-save me-1"></i> Update Slot
                                 </button>
-                            @else
-                                <button type="button" class="btn btn-secondary px-5 rounded-pill shadow-sm" disabled>
-                                    <i class="fas fa-lock me-2"></i> Cannot Edit Booked Slot
-                                </button>
-                            @endif
+                                <a href="{{ route('doctor.schedule.index') }}"
+                                    class="btn btn-outline-secondary rounded-pill px-4">
+                                    <i class="fas fa-times me-1"></i> Cancel
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -93,3 +91,21 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            forms.forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                });
+            });
+        })();
+    </script>
+@endpush

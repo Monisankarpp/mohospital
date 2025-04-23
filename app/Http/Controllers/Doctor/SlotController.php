@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Doctor;
 
-use App\Models\Slot;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreScheduleRequest;
+use App\Models\DoctorSchedule;
+use App\Models\Slot;
+use App\Services\SlotGeneratorService;
+use App\Jobs\ProcessSlotGeneration;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class SlotController extends Controller
@@ -13,65 +17,96 @@ class SlotController extends Controller
 
 	public function index()
 	{
-		$slots = Slot::where('doctor_id', auth()->user()->doctor->id)
+		if (auth()->user()->doctor->schedules()->doesntExist()) {
+			return redirect()->route('doctor.slots.first-time-setup');
+		}
+
+		$slots = auth()->user()->doctor->slots()
+			->where('start_time', '>=', now())
 			->latest()
-			->paginate(8);
+			->paginate(10);
 
 		return view('doctor.slots.index', compact('slots'));
 	}
 
-	public function create()
+	public function firstTimeSetup()
 	{
-		return view('doctor.slots.create');
+		return view('doctor.slots.first-time-setup');
 	}
 
-	public function store(Request $request)
+	public function storeFirstTimeSetup(StoreScheduleRequest $request)
+	{
+		$doctor = auth()->user()->doctor;
+
+		foreach ($request->days as $day) {
+			$doctor->schedules()->create([
+				'day' => $day,
+				'start_time' => $request->start_time,
+				'end_time' => $request->end_time,
+				'lunch_start' => $request->lunch_start,
+				'lunch_end' => $request->lunch_end,
+				'slot_duration' => $request->slot_duration,
+				'break_between_slots' => $request->break_between_slots,
+				'is_active' => true,
+				'is_recurring' => true,
+			]);
+		}
+
+		// Replace direct generation with queued job
+		ProcessSlotGeneration::dispatch($doctor, true)
+			->onQueue('slot-generation');
+
+		return redirect()->route('doctor.slots.index')
+			->with('success', 'Slot generation started. You will receive a notification when complete.');
+	}
+
+	public function confirmRecurrence(Request $request)
 	{
 		$request->validate([
-			'doctor_id' => 'required|integer',
-			'start_time' => 'required|date',
-			'end_time' => 'required|date|after:start_time',
+			'recurrence' => 'required|in:same,new',
 		]);
 
-		Slot::create([
-			'doctor_id' => auth()->user()->doctor->id,
-			'start_time' => $request->start_time,
-			'end_time' => $request->end_time,
-			'is_booked' => false,
-		]);
+		if ($request->recurrence === 'same') {
+			// Replace direct generation with queued job
+			ProcessSlotGeneration::dispatch(auth()->user()->doctor)
+				->onQueue('slot-generation');
 
-		return redirect()->route('doctor.slots.index')->with('success', 'Slot created successfully.');
+			return redirect()->route('doctor.slots.index')
+				->with('success', 'Your slots are being regenerated. You will be notified when complete.');
+		}
+
+		return redirect()->route('doctor.slots.first-time-setup');
 	}
 
-	public function edit($id)
+	public function edit(Slot $slot)
 	{
-		$slot = Slot::findOrFail($id);
-
-		if ($slot->doctor_id !== auth()->user()->doctor->id) {
-			abort(403, 'Unauthorized action.');
-		}
+		$this->authorize('update', $slot);
 
 		return view('doctor.slots.edit', compact('slot'));
 	}
+
 	public function update(Request $request, Slot $slot)
 	{
-		$request->validate([
+		$this->authorize('update', $slot);
+
+		$validated = $request->validate([
 			'start_time' => 'required|date',
 			'end_time' => 'required|date|after:start_time',
 		]);
 
-		$slot->update([
-			'start_time' => $request->start_time,
-			'end_time' => $request->end_time,
-		]);
+		$slot->update($validated);
 
-		return redirect()->route('doctor.slots.index')->with('success', 'Slot updated successfully.');
+		return redirect()->route('doctor.slots.index')
+			->with('success', 'Slot updated successfully.');
 	}
 
 	public function destroy(Slot $slot)
 	{
+		$this->authorize('delete', $slot);
+
 		$slot->delete();
 
-		return redirect()->route('doctor.slots.index')->with('success', 'Slot deleted.');
+		return redirect()->route('doctor.slots.index')
+			->with('success', 'Slot deleted successfully.');
 	}
 }

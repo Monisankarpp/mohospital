@@ -50,7 +50,8 @@
 
                         <!-- Form Actions -->
                         <div class="d-flex justify-content-end gap-4 mt-5">
-                            <a href="{{ route('doctor.slots.index') }}" class="btn btn-outline-secondary px-5 rounded-pill">
+                            <a href="{{ route('doctor.schedule.index') }}"
+                                class="btn btn-outline-secondary px-5 rounded-pill">
                                 <i class="fas fa-times me-2"></i> Cancel
                             </a>
                             <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">
