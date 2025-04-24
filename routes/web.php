@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\PaymentController;
+
 
 
 use App\Http\Controllers\Patient\{
@@ -15,7 +17,6 @@ use App\Http\Controllers\Patient\{
     ProfileController as PatientProfileController,
     AppointmentController as PatientAppointmentController,
     PrescriptionController as PatientPrescriptionController,
-    PaymentController as PatientPaymentController
 };
 
 use App\Http\Controllers\Doctor\{
@@ -76,7 +77,6 @@ Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(
 
     Route::get('/prescription/{id}', [PatientPrescriptionController::class, 'show'])->name('prescriptions.show');
     Route::get('/prescriptions', [PatientPrescriptionController::class, 'index'])->name('prescriptions');
-    Route::get('/payments', [PatientPaymentController::class, 'index'])->name('payments');
 });
 
 // --------------------
@@ -106,16 +106,12 @@ Route::middleware(['role:doctor'])
         });
 
         Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
+        Route::get('/appointments/{id}', [DoctorAppointmentController::class, 'show'])->name('appointments.show');
+
 
         Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
         Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
 
-        // ✅ Register first-time-setup BEFORE slots resource
-        Route::get('/slots/first-time-setup', [SlotController::class, 'firstTimeSetup'])->name('slots.first-time-setup');
-        Route::post('/slots/first-time-setup', [SlotController::class, 'storeFirstTimeSetup'])->name('slots.store-first-time');
-
-        // ✅ Then register slots resource
-        Route::resource('slots', SlotController::class)->except(['show']);
     });
 
 
@@ -137,6 +133,9 @@ Route::get('/get-available-dates/{doctor}', [App\Http\Controllers\DoctorControll
 
 Route::post('/appointments/book', [DoctorController::class, 'book'])->name('appointments.book');
 
+// Booking routes
+Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
+Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 
 
 // routes/web.php

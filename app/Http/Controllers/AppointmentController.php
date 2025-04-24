@@ -26,7 +26,7 @@ class AppointmentController extends Controller
         $slot->is_booked = true;
         $slot->save();
 
-        Appointment::create([
+        $appointment = Appointment::create([
             'slot_id' => $slot->id,
             'doctor_id' => $request->doctor_id,
             'user_id' => auth()->id(),
@@ -36,7 +36,8 @@ class AppointmentController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->back()->with('success', 'Appointment booked successfully!');
+        return redirect()->route('appointments.show', $appointment)
+            ->with('success', 'Appointment booked successfully!');
     }
 
 

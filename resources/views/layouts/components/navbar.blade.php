@@ -17,16 +17,6 @@
             <span class="text-primary">Mo</span><span class="text-light">Hospital</span>
         </a>
 
-        <!-- Search -->
-        <form class="d-none d-md-flex ms-auto me-4 w-50">
-            <div class="input-group">
-                <span class="input-group-text border-end-0 text-secondary">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </span>
-                <input type="text" class="form-control border-start-0 text-dark" placeholder="Search...">
-            </div>
-        </form>
-
         <!-- Right Side -->
         <ul class="navbar-nav ms-auto align-items-center">
 

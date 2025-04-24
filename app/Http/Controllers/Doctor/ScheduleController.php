@@ -8,6 +8,7 @@ use App\Services\SlotGeneratorService;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Slot;
+use App\Models\Doctor;
 
 class ScheduleController extends Controller
 {
@@ -26,9 +27,16 @@ class ScheduleController extends Controller
   {
     $doctor = auth()->user()->doctor;
     $currentSchedule = $doctor->currentSchedule();
-    $slots = $currentSchedule
-      ? $currentSchedule->slots()->with('appointment')->orderBy('date')->orderBy('start_time')->get()
-      : collect();
+    $doctor = Doctor::where('user_id', auth()->id())->firstOrFail();
+    $slots = Slot::where('doctor_id', $doctor->id)
+      ->whereBetween('date', [$currentSchedule->valid_from, $currentSchedule->valid_to])
+      ->with('appointment')
+      ->get()
+      ->groupBy(function ($slot) {
+        return \Carbon\Carbon::parse($slot->date)->format('Y-m-d');
+      });
+
+
     return view('doctor.slots.index', compact('currentSchedule', 'slots'));
   }
 

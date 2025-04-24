@@ -67,17 +67,6 @@
                         <i class="fas fa-chevron-right ms-auto text-muted"></i>
                     </a>
                 </li>
-
-                <li class="nav-item mb-2">
-                    <a href="{{ route('patient.payments') }}"
-                        class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('patient.payments*') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-warning bg-opacity-10">
-                            <i class="fas fa-money-bill-wave text-warning"></i>
-                        </div>
-                        <span class="fw-medium">Payments</span>
-                        <i class="fas fa-chevron-right ms-auto text-muted"></i>
-                    </a>
-                </li>
             @elseif(auth()->user()->role == 'doctor')
                 <li class="nav-item mb-2">
                     <a href="{{ route('doctor.dashboard') }}"
