@@ -77,6 +77,7 @@ class PaymentController extends Controller
 
         if ($appointment->slot) {
           $appointment->slot->is_booked = 1;
+          $appointment->slot->status = 'booked';
           $appointment->slot->save();
         }
 

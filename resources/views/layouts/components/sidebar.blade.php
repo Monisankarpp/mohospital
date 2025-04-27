@@ -102,7 +102,7 @@
                 </li>
 
                 <li class="nav-item mb-2">
-                    <a href="{{ route('doctor.schedule.index') }}"
+                    <a href="{{ route('doctor.slots.index') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.slots*') ? 'active' : 'text-white-50' }}">
                         <div class="icon-wrapper me-3 bg-info bg-opacity-10">
                             <i class="fas fa-clock text-info"></i>

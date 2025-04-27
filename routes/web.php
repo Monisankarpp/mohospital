@@ -141,21 +141,21 @@ Route::middleware('role:patient')->post('/payment/create-intent', [PaymentContro
 Route::middleware('role:patient')->post('/payment/success', [PaymentController::class, 'paymentSuccess']);
 
 // routes/web.php
-Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
-    // First-time setup
-    Route::get('slots/setup', [SlotSetupController::class, 'create'])->name('slots.setup');
-    Route::post('slots/setup', [SlotSetupController::class, 'store'])->name('slots.store');
+// Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
+//     // First-time setup
+//     Route::get('slots/setup', [SlotSetupController::class, 'create'])->name('slots.setup');
+//     Route::post('slots/setup', [SlotSetupController::class, 'store'])->name('slots.store');
 
-    // Schedule management
-    Route::get('schedule', [ScheduleController::class, 'index'])->name('schedule.index');
-    Route::get('slots/{slot}/edit', [ScheduleController::class, 'edit'])->name('slots.edit');
-    Route::put('slots/{slot}', [ScheduleController::class, 'update'])->name('slots.update');
-    Route::delete('slots/{slot}', [ScheduleController::class, 'destroy'])->name('slots.destroy');
+//     // Schedule management
+//     Route::get('schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+//     Route::get('slots/{slot}/edit', [ScheduleController::class, 'edit'])->name('slots.edit');
+//     Route::put('slots/{slot}', [ScheduleController::class, 'update'])->name('slots.update');
+//     Route::delete('slots/{slot}', [ScheduleController::class, 'destroy'])->name('slots.destroy');
 
-    // Schedule reuse confirmation
-    Route::post('schedule/confirm', [ScheduleController::class, 'confirmReuseSchedule'])
-        ->name('schedule.confirm');
-});
+//     // Schedule reuse confirmation
+//     Route::post('schedule/confirm', [ScheduleController::class, 'confirmReuseSchedule'])
+//         ->name('schedule.confirm');
+// });
 
 Route::middleware(['doctor.first.login'])->group(function () {
     Route::view('/doctor/first-login', 'doctor.first-login');
@@ -166,4 +166,15 @@ Route::get('/doctor/message-patient/{patient_id}', [DoctorController::class, 'me
 
 Route::post('/appointment/prepare', [\App\Http\Controllers\AppointmentControllerForID::class, 'prepare']);
 
+// Route::middleware(['auth', 'verified'])->group(function () {
+// Doctor routes
+Route::prefix('doctor')->as('doctor.')->middleware('role:doctor')->group(function () {
+    Route::resource('slots', SlotController::class)->except(['show']);
+    Route::post('slots/apply-default', [SlotController::class, 'applyDefaultSchedule'])
+        ->name('slots.apply-default');
+});
 
+// });
+
+
+Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');

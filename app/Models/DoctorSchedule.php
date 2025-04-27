@@ -10,27 +10,21 @@ class DoctorSchedule extends Model
     use SoftDeletes;
     protected $fillable = [
         'doctor_id',
+        'day_of_week',
+        'is_working',
         'start_time',
         'end_time',
         'lunch_start',
         'lunch_end',
-        'working_days',
-        'breaks',
-        'is_recurring',
-        'valid_from',
-        'valid_to',
+        'slot_duration',
+        'break_between_slots',
     ];
 
     protected $casts = [
-        'working_days' => 'array',
-        'breaks' => 'array',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
         'lunch_start' => 'datetime:H:i',
         'lunch_end' => 'datetime:H:i',
-        'valid_from' => 'date',
-        'valid_to' => 'date',
-        'is_recurring' => 'boolean',
     ];
 
     public function doctor()

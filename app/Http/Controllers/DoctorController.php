@@ -90,7 +90,7 @@ class DoctorController extends Controller
         $slot = Slot::where('id', $validated['slot_id'])
             ->where('doctor_id', $validated['doctor_id'])
             ->where('date', $validated['date'])
-            ->where('is_booked', 0)
+            ->where('status', 'available')
             ->first();
 
         if (!$slot) {
@@ -110,7 +110,7 @@ class DoctorController extends Controller
                 // 'expires_at' => now()->addMinutes(30)
             ]);
 
-            $slot->update(['is_booked' => 1]);
+            $slot->update(['status' => 'booked']);
             return $appointment;
         });
 

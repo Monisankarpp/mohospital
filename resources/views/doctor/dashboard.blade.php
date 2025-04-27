@@ -79,8 +79,7 @@
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a href="{{ route('doctor.schedule.index') }}"
-                                class="btn btn-sm btn-outline-warning rounded-pill">
+                            <a href="{{ route('doctor.slots.index') }}" class="btn btn-sm btn-outline-warning rounded-pill">
                                 View All <i class="fa-solid fa-chevron-right ms-1"></i>
                             </a>
                         </div>
@@ -97,7 +96,7 @@
                         <i class="fas fa-calendar-alt text-primary me-2"></i>Today's Schedule
                     </h5>
                     <div class="d-flex flex-wrap align-items-center gap-2">
-                        <a href="{{ route('doctor.schedule.index') }}"
+                        <a href="{{ route('doctor.slots.index') }}"
                             class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
                             View All
                         </a>

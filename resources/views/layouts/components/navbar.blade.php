@@ -45,14 +45,14 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h6 class="mb-0 fw-bold"><i class="bi bi-bell-fill me-2"></i>Notifications</h6>
                             <span class="badge bg-white text-primary rounded-pill">
-                                {{ auth()->user()->notifications()->count() }} New
+                                {{ auth()->user()->notifications()->where('is_read', false)->count() }} New
                             </span>
                         </div>
                     </li>
 
                     <!-- Notification items container with scroll -->
                     <div style="max-height: 400px; overflow-y: auto; background-color: #f8f9fa;">
-                        @forelse(auth()->user()->notifications()->latest()->take(2)->get() as $notification)
+                        @forelse(auth()->user()->notifications()->where('is_read', false)->latest()->take(2)->get() as $notification)
                             <li class="border-bottom border-light">
                                 <a href="javascript:void(0);"
                                     class="dropdown-item d-flex py-3 px-3 position-relative notification-item"
@@ -109,18 +109,18 @@
             </li>
 
             <!-- Modal for displaying full message -->
-            <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel"
+            <div class="modal" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel"
                 aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered"> <!-- Added modal-dialog-centered -->
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="notificationModalLabel">Notification</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                                aria-label="Close"></button> <!-- Correct close button -->
                         </div>
                         <div class="modal-body">
-                            <h6 id="notificationTitle"></h6>
-                            <p id="notificationMessage"></p>
+                            <h6 id="notificationTitle" class="fw-bold mb-2"></h6>
+                            <p id="notificationMessage" class="text-muted"></p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -128,6 +128,7 @@
                     </div>
                 </div>
             </div>
+
 
             <!-- Profile Dropdown -->
             <li class="nav-item dropdown ms-3">
@@ -218,12 +219,12 @@
     @csrf
 </form>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
 <script>
     $(document).ready(function() {
-        // When a notification is clicked
-        $('.notification-item').on('click', function() {
-            // Get the notification data
+        $(document).on('click', '.notification-item', function() {
             var notificationId = $(this).data('id');
             var notificationTitle = $(this).data('title');
             var notificationMessage = $(this).data('message');
@@ -233,29 +234,27 @@
             $('#notificationTitle').text(notificationTitle);
             $('#notificationMessage').text(notificationMessage);
 
-            // Open the modal
-            $('#notificationModal').modal('show');
+            // Show modal properly
+            var myModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+            myModal.show();
 
-            // Mark the notification as read after the modal is closed
-            $('#notificationModal').on('hidden.bs.modal', function() {
-                $.ajax({
-                    url: '/notifications/' + notificationId +
-                        '/read', // Adjust the URL according to your routes
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}' // CSRF token for security
-                    },
-                    success: function(response) {
-                        // Optionally update the notification badge or status
-                        // Example: Remove the unread indicator from the notification item
-                        $('li[data-id="' + notificationId + '"] .position-absolute')
-                            .remove();
-                    },
-                    error: function(error) {
-                        console.log('Error marking notification as read:', error);
-                    }
-                });
+            // Mark notification as read immediately
+            $.ajax({
+                url: '/notifications/' + notificationId + '/read',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    console.log('Notification marked as read');
+                    $('a[data-id="' + notificationId + '"] .position-absolute.bg-danger')
+                        .remove();
+                },
+                error: function(error) {
+                    console.log('Error marking notification as read');
+                }
             });
+
         });
     });
 </script>

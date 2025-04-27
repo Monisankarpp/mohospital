@@ -12,16 +12,20 @@ class Slot extends Model
 
     protected $fillable = [
         'doctor_id',
+        'date',
         'start_time',
         'end_time',
-        'is_booked',
-        'date',
+        'status',
+        'is_lunch_break',
+        'appointment_id',
+        'can_edit_until',
     ];
 
     protected $casts = [
+        'date' => 'date',
         'start_time' => 'datetime',
         'end_time' => 'datetime',
-        'date' => 'date',
+        'can_edit_until' => 'datetime',
     ];
 
     public function doctor()
@@ -31,15 +35,19 @@ class Slot extends Model
 
     public function appointment()
     {
-        return $this->hasOne(Appointment::class);
+        return $this->belongsTo(Appointment::class);
     }
     public function schedule()
     {
         return $this->belongsTo(DoctorSchedule::class, 'doctor_schedule_id');
     }
-    public function isEditable()
+    // public function isEditable()
+    // {
+    //     return !$this->is_booked && $this->start_time->diffInHours(now()) < 24;
+    // }
+    public function isEditable(): bool
     {
-        return !$this->is_booked && $this->start_time->diffInHours(now()) < 24;
+        return now()->lt($this->can_edit_until);
     }
 
 }

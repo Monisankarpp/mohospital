@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Doctor;
@@ -9,141 +10,87 @@ use Carbon\CarbonPeriod;
 
 class SlotGeneratorService
 {
-	public function generateSlots(Doctor $doctor, array $data, bool $isRecurring = false)
+	public function generateSlotsForDoctor(Doctor $doctor, string $date): void
 	{
-		// Validate working days count
-		$workingDays = $data['working_days'];
-		if (count($workingDays) < 3 || count($workingDays) > 6) {
-			throw new \InvalidArgumentException('Doctor must work between 3 to 6 days a week');
+		$date = Carbon::parse($date);
+		$dayOfWeek = strtolower($date->englishDayOfWeek);
+
+		$schedule = $doctor->getScheduleForDay($dayOfWeek);
+
+		if (!$schedule || !$schedule->is_working) {
+			return;
 		}
 
-		// Create or update schedule
-		$schedule = $doctor->schedules()->create([
-			'start_time' => $data['start_time'],
-			'end_time' => $data['end_time'],
-			'lunch_start' => $data['lunch_start'],
-			'lunch_end' => $data['lunch_end'],
-			'breaks' => $data['breaks'] ?? null,
-			'working_days' => $workingDays,
-			'is_recurring' => $isRecurring,
-			'valid_from' => now()->startOfWeek(),
-			'valid_to' => now()->endOfWeek(),
-		]);
+		// Delete any existing available slots for this date
+		Slot::where('doctor_id', $doctor->id)
+			->where('date', $date->format('Y-m-d'))
+			->where('status', 'available')
+			->delete();
 
-		// Generate slots for each working day
-		foreach ($workingDays as $day) {
-			$this->generateDaySlots($schedule, $day);
-		}
-
-		return $schedule;
+		$this->generateDailySlots($doctor, $schedule, $date);
 	}
 
-	protected function generateDaySlots(DoctorSchedule $schedule, string $day)
+	protected function generateDailySlots(Doctor $doctor, DoctorSchedule $schedule, Carbon $date): void
 	{
-		$date = $this->getNextDateForDay($day);
+		$startTime = Carbon::parse($date->format('Y-m-d') . ' ' . $schedule->start_time->format('H:i'));
+		$endTime = Carbon::parse($date->format('Y-m-d') . ' ' . $schedule->end_time->format('H:i'));
 
-		// Create time slots excluding breaks
-		$slots = $this->calculateAvailableSlots($schedule);
+		$slotDuration = $schedule->slot_duration;
+		$breakBetweenSlots = $schedule->break_between_slots;
 
-		foreach ($slots as $slot) {
-			$startTime = Carbon::parse($date->format('Y-m-d') . ' ' . $slot['start']);
-			$endTime = Carbon::parse($date->format('Y-m-d') . ' ' . $slot['end']);
+		// Generate regular slots
+		$this->generateTimeSlots($doctor, $date, $startTime, $endTime, $slotDuration, $breakBetweenSlots, $schedule);
+	}
 
-			$schedule->slots()->create([
-				'doctor_id' => $schedule->doctor_id,
+	protected function generateTimeSlots(Doctor $doctor, Carbon $date, Carbon $startTime, Carbon $endTime, int $slotDuration, int $breakBetweenSlots, DoctorSchedule $schedule): void
+	{
+		$currentSlotStart = $startTime->copy();
+
+		// Handle lunch break if exists
+		if ($schedule->lunch_start && $schedule->lunch_end) {
+			$lunchStart = Carbon::parse($date->format('Y-m-d') . ' ' . $schedule->lunch_start->format('H:i'));
+			$lunchEnd = Carbon::parse($date->format('Y-m-d') . ' ' . $schedule->lunch_end->format('H:i'));
+
+			// Generate slots before lunch
+			$this->createSlotsBetween($doctor, $currentSlotStart, $lunchStart, $slotDuration, $breakBetweenSlots, $date);
+
+			// Create lunch break slot
+			Slot::create([
+				'doctor_id' => $doctor->id,
 				'date' => $date,
-				'start_time' => $startTime,
-				'end_time' => $endTime,
-				'is_booked' => false,
+				'start_time' => $lunchStart,
+				'end_time' => $lunchEnd,
+				'status' => 'break',
+				'is_lunch_break' => true,
+				'can_edit_until' => $lunchStart->copy()->subDay(),
+			]);
+
+			$currentSlotStart = $lunchEnd->copy();
+		}
+
+		// Generate slots after lunch (or all day if no lunch)
+		$this->createSlotsBetween($doctor, $currentSlotStart, $endTime, $slotDuration, $breakBetweenSlots, $date);
+	}
+
+	protected function createSlotsBetween(Doctor $doctor, Carbon $start, Carbon $end, int $duration, int $break, Carbon $date): void
+	{
+		$period = CarbonPeriod::create($start, $duration + $break . ' minutes', $end);
+
+		foreach ($period as $slotStart) {
+			$slotEnd = $slotStart->copy()->addMinutes($duration);
+
+			if ($slotEnd > $end) {
+				break;
+			}
+
+			Slot::create([
+				'doctor_id' => $doctor->id,
+				'date' => $date,
+				'start_time' => $slotStart,
+				'end_time' => $slotEnd,
+				'status' => 'available',
+				'can_edit_until' => $slotStart->copy()->subDay(),
 			]);
 		}
-	}
-
-	protected function calculateAvailableSlots(DoctorSchedule $schedule): array
-	{
-		$slots = [];
-		$slotDuration = 30; // minutes
-
-		$start = Carbon::parse($schedule->start_time);
-		$end = Carbon::parse($schedule->end_time);
-
-		// Handle lunch break
-		$lunchStart = Carbon::parse($schedule->lunch_start);
-		$lunchEnd = Carbon::parse($schedule->lunch_end);
-
-		// Handle additional breaks
-		$breaks = collect($schedule->breaks ?? [])->map(function ($break) {
-			return [
-				'start' => Carbon::parse($break['start']),
-				'end' => Carbon::parse($break['end']),
-			];
-		});
-
-		$current = $start->copy();
-
-		while ($current->addMinutes($slotDuration) <= $end) {
-			$slotEnd = $current->copy()->addMinutes($slotDuration);
-
-			// Skip if during lunch
-			if (
-				$lunchStart && $lunchEnd &&
-				$current->between($lunchStart, $lunchEnd)
-			) {
-				$current = $lunchEnd->copy();
-				continue;
-			}
-
-			// Skip if during any break
-			$duringBreak = $breaks->first(function ($break) use ($current, $slotEnd) {
-				return $current->between($break['start'], $break['end']) ||
-					$slotEnd->between($break['start'], $break['end']);
-			});
-
-			if ($duringBreak) {
-				$current = $duringBreak['end']->copy();
-				continue;
-			}
-
-			// Add valid slot
-			$slots[] = [
-				'start' => $current->format('H:i'),
-				'end' => $slotEnd->format('H:i'),
-			];
-
-			$current = $slotEnd->copy();
-		}
-
-		return $slots;
-	}
-
-	protected function getNextDateForDay(string $day): Carbon
-	{
-		$date = now()->startOfWeek();
-
-		while (strtolower($date->format('l')) !== strtolower($day)) {
-			$date->addDay();
-		}
-
-		return $date;
-	}
-
-	public function duplicateScheduleForNextWeek(DoctorSchedule $currentSchedule)
-	{
-		$newSchedule = $currentSchedule->replicate();
-		$newSchedule->valid_from = $currentSchedule->valid_from->addWeek();
-		$newSchedule->valid_to = $currentSchedule->valid_to->addWeek();
-		$newSchedule->save();
-
-		// Duplicate slots
-		foreach ($currentSchedule->slots as $slot) {
-			$newSlot = $slot->replicate();
-			$newSlot->date = $slot->date->addWeek();
-			$newSlot->start_time = $slot->start_time->addWeek();
-			$newSlot->end_time = $slot->end_time->addWeek();
-			$newSlot->schedule_id = $newSchedule->id;
-			$newSlot->save();
-		}
-
-		return $newSchedule;
 	}
 }

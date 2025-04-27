@@ -9,15 +9,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Doctor extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $casts = [
-        'first_login' => 'boolean',
-    ];
-
     protected $fillable = [
         'user_id',
         'specialization',
         'status',
-        'first_login'
+        'first_login',
+        'default_schedule' => 'array',
+        'last_schedule_update' => 'datetime',
+    ];
+
+    protected $casts = [
+        'default_schedule' => 'array',
+        'last_schedule_update' => 'datetime',
     ];
 
     public function user()
@@ -50,6 +53,11 @@ class Doctor extends Model
             ->where('valid_from', '<=', now())
             ->where('valid_to', '>=', now())
             ->first();
+    }
+
+    public function getScheduleForDay(string $day): ?DoctorSchedule
+    {
+        return $this->schedules()->where('day_of_week', strtolower($day))->first();
     }
 }
 
