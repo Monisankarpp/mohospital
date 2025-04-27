@@ -43,3 +43,6 @@ Schedule::call(function () {
         }
     }
 })->dailyAt('23:00');
+
+
+Schedule::command('appointments:cleanup')->everyFiveMinutes();

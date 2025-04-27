@@ -17,7 +17,8 @@ class AppointmentController extends Controller
         $query->where('user_id', $doctorUserId);
       })
       ->latest()
-      ->get();
+      ->paginate(9); // Adjust number as needed
+
 
     return view('doctor.appointments', compact('appointments'));
   }

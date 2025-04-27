@@ -29,12 +29,13 @@
                                 <i class="fa-solid fa-calendar text-primary fa-xl"></i>
                             </div>
                             <div>
-                                <h3 class="mb-0 fw-bold">5</h3>
+                                <h3 class="mb-0 fw-bold">{{ $upcomingAppointmentsCount }}</h3>
                                 <small class="text-muted">Upcoming Appointments</small>
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a href="" class="btn btn-sm btn-outline-primary rounded-pill">
+                            <a href="{{ route('doctor.appointments') }}"
+                                class="btn btn-sm btn-outline-primary rounded-pill">
                                 View All <i class="fa-solid fa-chevron-right ms-1"></i>
                             </a>
                         </div>
@@ -51,12 +52,12 @@
                                 <i class="fa-solid fa-file-medical text-success fa-xl"></i>
                             </div>
                             <div>
-                                <h3 class="mb-0 fw-bold">3</h3>
-                                <small class="text-muted">Active Prescriptions</small>
+                                <h3 class="mb-0 fw-bold">{{ $totalPatientsCount }}</h3>
+                                <small class="text-muted">Total Patients</small>
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a href="" class="btn btn-sm btn-outline-success rounded-pill">
+                            <a href="{{ route('doctor.my-patients') }}" class="btn btn-sm btn-outline-success rounded-pill">
                                 View All <i class="fa-solid fa-chevron-right ms-1"></i>
                             </a>
                         </div>
@@ -73,12 +74,13 @@
                                 <i class="fa-solid fa-sack-dollar text-warning fa-xl"></i>
                             </div>
                             <div>
-                                <h3 class="mb-0 fw-bold">2</h3>
-                                <small class="text-muted">Pending Payments</small>
+                                <h3 class="mb-0 fw-bold">{{ $totalAvailableSlots }}</h3>
+                                <small class="text-muted">Total Available Slots</small>
                             </div>
                         </div>
                         <div class="mt-3">
-                            <a href="" class="btn btn-sm btn-outline-warning rounded-pill">
+                            <a href="{{ route('doctor.schedule.index') }}"
+                                class="btn btn-sm btn-outline-warning rounded-pill">
                                 View All <i class="fa-solid fa-chevron-right ms-1"></i>
                             </a>
                         </div>
@@ -95,14 +97,10 @@
                         <i class="fas fa-calendar-alt text-primary me-2"></i>Today's Schedule
                     </h5>
                     <div class="d-flex flex-wrap align-items-center gap-2">
-                        <a href="" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
-                            <i class="fas fa-plus-circle me-1"></i> Add Availability
+                        <a href="{{ route('doctor.schedule.index') }}"
+                            class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+                            View All
                         </a>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-sm btn-outline-primary">Day</button>
-                            <button class="btn btn-sm btn-outline-primary">Week</button>
-                            <button class="btn btn-sm btn-outline-primary">Month</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -120,51 +118,49 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="border-top border-light">
-                                <td class="ps-4 py-3 text-dark">09:00 AM</td>
-                                <td class="py-3">
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold text-dark">John Smith</h6>
-                                        <small class="text-muted">ID: P10045</small>
-                                    </div>
-                                </td>
-                                <td class="py-3">
-                                    <span
-                                        class="badge bg-soft-primary text-primary rounded-pill px-3 py-1">Consultation</span>
-                                </td>
-                                <td class="py-3">
-                                    <span class="badge bg-soft-success text-success rounded-pill px-3 py-1">Confirmed</span>
-                                </td>
-                                <td class="pe-4 py-3 text-end">
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 hover-scale">
-                                        <i class="fas fa-play me-1"></i> Start
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <!-- Example Additional Row -->
-                            <tr class="border-top border-light">
-                                <td class="ps-4 py-3 text-dark">10:30 AM</td>
-                                <td class="py-3">
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold text-dark">Emily Davis</h6>
-                                        <small class="text-muted">ID: P10078</small>
-                                    </div>
-                                </td>
-                                <td class="py-3">
-                                    <span class="badge bg-soft-info text-info rounded-pill px-3 py-1">Follow-up</span>
-                                </td>
-                                <td class="py-3">
-                                    <span class="badge bg-soft-warning text-warning rounded-pill px-3 py-1">Pending</span>
-                                </td>
-                                <td class="pe-4 py-3 text-end">
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 hover-scale">
-                                        <i class="fas fa-play me-1"></i> Start
-                                    </button>
-                                </td>
-                            </tr>
-
+                            @forelse ($appointmentsToday as $appointment)
+                                <tr class="border-top border-light">
+                                    <td class="ps-4 py-3 text-dark">
+                                        {{ \Carbon\Carbon::parse($appointment->slot->start_time)->format('h:i A') }}
+                                    </td>
+                                    <td class="py-3">
+                                        <div>
+                                            <h6 class="mb-1 fw-semibold text-dark">{{ $appointment->patient->name }}</h6>
+                                            <small class="text-muted">ID: {{ $appointment->patient->id }}</small>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <span
+                                            class="badge bg-soft-primary text-primary rounded-pill px-3 py-1">Consultation</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span
+                                            class="badge bg-soft-success text-success rounded-pill px-3 py-1 
+                                            {{ $appointment->status === 'confirmed'
+                                                ? 'bg-soft-success text-success'
+                                                : ($appointment->status === 'pending'
+                                                    ? 'bg-soft-warning text-warning'
+                                                    : ($appointment->status === 'cancelled'
+                                                        ? 'bg-soft-danger text-danger'
+                                                        : 'bg-secondary text-white')) }}">
+                                            {{ ucfirst($appointment->status) }}
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3 hover-scale">
+                                            <i class="fas fa-play me-1"></i> Start
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="fas fa-info-circle me-2"></i>No appointments scheduled for today.
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
+
                     </table>
                 </div>
             </div>
@@ -176,7 +172,7 @@
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-header bg-white border-0 py-4 px-4 rounded-top-4">
                 <h5 class="mb-0 fw-bold text-slate-700">
-                    <i class="fas fa-user-injured me-2 text-primary"></i>Recent Patients
+                    <i class="fas fa-user-injured me-2 text-primary"></i>Recent Patient
                 </h5>
             </div>
 
@@ -188,43 +184,60 @@
                                 <th class="ps-4 text-uppercase small fw-bold">Patient</th>
                                 <th class="text-uppercase small fw-bold">Last Visit</th>
                                 <th class="text-uppercase small fw-bold">Condition</th>
+                                <th class="text-uppercase small fw-bold">Consultation Fee</th>
                                 <th class="pe-4 text-end text-uppercase small fw-bold">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="border-top border-light">
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://via.placeholder.com/40" class="rounded-circle shadow-sm me-3"
-                                            width="40" height="40">
-                                        <div>
-                                            <h6 class="mb-1 fw-semibold text-dark">Sarah Johnson</h6>
-                                            <small class="text-muted">35 years</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3 text-muted">2 days ago</td>
-                                <td class="py-3">
-                                    <span
-                                        class="badge bg-soft-danger text-danger rounded-pill px-3 py-1">Hypertension</span>
-                                </td>
-                                <td class="pe-4 py-3 text-end">
-                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2 hover-scale">
-                                        <i class="fas fa-file-medical me-1"></i>Records
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-success rounded-pill px-3 hover-scale">
-                                        <i class="fas fa-comment-medical me-1"></i>Message
-                                    </button>
-                                </td>
-                            </tr>
+                            @forelse ($recentPatients as $appointment)
+                                <tr class="border-top border-light">
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="d-flex justify-content-center align-items-center rounded-circle bg-light shadow-sm me-3"
+                                                style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user text-secondary" style="font-size: 18px;"></i>
+                                            </div>
 
-                            <!-- Add more patient rows below this -->
+                                            <div>
+                                                <h6 class="mb-1 fw-semibold text-dark">{{ $appointment->patient->name }}
+                                                </h6>
+                                                <small class="text-muted">{{ rand(15, 80) }}
+                                                    years</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-muted">{{ $appointment->created_at->diffForHumans() }}</td>
+                                    <td class="py-3">
+                                        <span class="bg-soft-danger text-danger rounded-pill px-3 py-1">
+                                            Fever
+                                        </span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="bg-soft-danger text-success rounded-pill px-3 py-1">
+                                            $ 100
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <a href="{{ route('doctor.message.patient', ['patient_id' => $appointment->patient->id]) }}"
+                                            class="btn btn-sm btn-outline-success rounded-pill px-3 hover-scale">
+                                            <i class="fas fa-comment-medical me-1"></i>Message
+                                        </a>
+
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">No recent patients found.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
+
                     </table>
                 </div>
 
                 <div class="card-footer bg-white border-0 text-end py-3 px-4">
-                    <a href="#" class="btn btn-primary rounded-pill px-4 shadow-sm hover-scale">
+                    <a href="{{ route('doctor.my-patients') }}"
+                        class="btn btn-primary rounded-pill px-4 shadow-sm hover-scale">
                         View All Patients
                     </a>
                 </div>

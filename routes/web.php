@@ -24,6 +24,7 @@ use App\Http\Controllers\Doctor\{
     ProfileController as DoctorProfileController,
     AppointmentController as DoctorAppointmentController,
     PrescriptionController as DoctorPrescriptionController,
+    PatientController as DoctorPatientController,
     SlotController,
     SlotSetupController,
     ScheduleController,
@@ -112,6 +113,9 @@ Route::middleware(['role:doctor'])
         Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
         Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
 
+        Route::get('/my-patients', [DoctorPatientController::class, 'index'])->name('my-patients');
+
+
     });
 
 
@@ -133,10 +137,8 @@ Route::get('/get-available-dates/{doctor}', [App\Http\Controllers\DoctorControll
 
 Route::post('/appointments/book', [DoctorController::class, 'book'])->name('appointments.book');
 
-// Booking routes
-Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
-Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-
+Route::middleware('role:patient')->post('/payment/create-intent', [PaymentController::class, 'createPaymentIntent']);
+Route::middleware('role:patient')->post('/payment/success', [PaymentController::class, 'paymentSuccess']);
 
 // routes/web.php
 Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
@@ -155,7 +157,13 @@ Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(fun
         ->name('schedule.confirm');
 });
 
-// Add this to your auth middleware if you want to check first login
 Route::middleware(['doctor.first.login'])->group(function () {
     Route::view('/doctor/first-login', 'doctor.first-login');
 });
+
+Route::get('/doctor/message-patient/{patient_id}', [DoctorController::class, 'messagePatient'])
+    ->name('doctor.message.patient');
+
+Route::post('/appointment/prepare', [\App\Http\Controllers\AppointmentControllerForID::class, 'prepare']);
+
+

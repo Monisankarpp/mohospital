@@ -6,6 +6,12 @@ use App\Models\Slot;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Appointment;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\DoctorMessageMail;
+use App\Jobs\SendDoctorMessageEmail;
+use Illuminate\Support\Facades\DB;
+
 
 class DoctorController extends Controller
 {
@@ -73,36 +79,56 @@ class DoctorController extends Controller
     }
     public function book(Request $request)
     {
-        // Validate the request data
-        $request->validate([
+        $validated = $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
             'date' => 'required|date',
             'slot_id' => 'required|exists:slots,id',
+            'patient_notes' => 'nullable|string'
         ]);
 
-        // Ensure the slot belongs to the selected doctor and is available
-        $slot = Slot::where('id', $request->slot_id)
-            ->where('doctor_id', $request->doctor_id)
+        // Check slot availability
+        $slot = Slot::where('id', $validated['slot_id'])
+            ->where('doctor_id', $validated['doctor_id'])
+            ->where('date', $validated['date'])
             ->where('is_booked', 0)
             ->first();
 
         if (!$slot) {
-            return back()->withErrors('Selected slot is no longer available.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Selected slot is no longer available.'
+            ], 400);
         }
+        $appointment = DB::transaction(function () use ($validated, $slot) {
+            $appointment = Appointment::create([
+                'patient_id' => auth()->id(),
+                'doctor_id' => $validated['doctor_id'],
+                'slot_id' => $validated['slot_id'],
+                'patient_notes' => $validated['patient_notes'] ?? null,
+                'status' => 'pending',
+                // 'fee' => $slot->fee,
+                // 'expires_at' => now()->addMinutes(30)
+            ]);
 
-        // Create the appointment
-        Appointment::create([
-            'patient_id' => auth()->id(),
-            'doctor_id' => $request->doctor_id,
-            'slot_id' => $request->slot_id,
-            'status' => 'accepted',
+            $slot->update(['is_booked' => 1]);
+            return $appointment;
+        });
+
+
+        return response()->json([
+            'success' => true,
+            'appointment_id' => $appointment->id
         ]);
-
-        // Mark the slot as booked
-        $slot->update(['is_booked' => 1]);
-
-        // Return success message
-        return redirect()->back()->with('success', 'Appointment booked successfully.');
     }
+
+    public function messagePatient($patient_id)
+    {
+        $patient = User::findOrFail($patient_id);
+
+        SendDoctorMessageEmail::dispatch($patient); // Queued job
+
+        return redirect()->back()->with('success', 'Message is being sent to the patient.');
+    }
+
 
 }

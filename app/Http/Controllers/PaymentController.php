@@ -3,71 +3,103 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Stripe\StripeClient;
-use Stripe\Exception\ApiErrorException;
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
 use App\Models\Appointment;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Payment;
+use Illuminate\Support\Facades\DB;
+use App\Jobs\NotifyDoctorAndPatient;
 
 class PaymentController extends Controller
 {
-  protected $stripe;
-
-  public function __construct()
+  public function createPaymentIntent(Request $request)
   {
-    $this->stripe = new StripeClient(config('services.stripe.secret'));
+    if (!auth()->check()) {
+      return response()->json(['error' => 'Unauthenticated'], 401);
+    }
+
+    $request->validate(['appointment_id' => 'required|exists:appointments,id']);
+
+    $appointment = Appointment::with('slot.doctor.user')
+      ->where('id', $request->appointment_id)
+      ->where('patient_id', auth()->id())
+      ->where('status', 'pending')
+      ->firstOrFail();
+
+    Stripe::setApiKey(config('services.stripe.secret'));
+
+    $amount = 10000; // $100.00 in cents (adjust as needed)
+
+    $intent = PaymentIntent::create([
+      'amount' => $amount,
+      'currency' => 'usd',
+      'metadata' => [
+        'appointment_id' => $appointment->id,
+        'user_id' => $appointment->patient_id,
+        'transaction_id' => $appointment->slot->doctor->id ?? 'N/A',
+      ],
+      'description' => 'Appointment with Dr. ' . ($appointment->slot->doctor->user->name ?? 'Unknown')
+    ]);
+
+    return response()->json([
+      'client_secret' => $intent->client_secret,
+      'appointment_id' => $appointment->id
+    ]);
   }
 
-  public function createIntent(Request $request)
+  public function paymentSuccess(Request $request)
   {
     $request->validate([
-      'doctor_id' => 'required|exists:doctors,id',
-      'amount' => 'required|numeric|min:1',
+      'appointment_id' => 'required|exists:appointments,id',
+      'payment_intent_id' => 'required|string'
     ]);
 
     try {
-      $paymentIntent = $this->stripe->paymentIntents->create([
-        'amount' => $request->amount,
-        'currency' => 'usd',
-        'automatic_payment_methods' => [
-          'enabled' => true,
-        ],
-        'metadata' => [
-          'doctor_id' => $request->doctor_id,
-          'user_id' => Auth::id(),
-        ],
-      ]);
+      $appointment = Appointment::with('slot.doctor.user')
+        ->where('id', $request->appointment_id)
+        ->where('patient_id', auth()->id())
+        ->where('status', 'pending')
+        ->firstOrFail();
 
+      Stripe::setApiKey(config('services.stripe.secret'));
+      $intent = PaymentIntent::retrieve($request->payment_intent_id);
+
+      if ($intent->status !== 'succeeded' || $intent->metadata['appointment_id'] != $appointment->id) {
+        return response()->json([
+          'success' => false,
+          'message' => 'Payment verification failed'
+        ], 400);
+      }
+
+      DB::transaction(function () use ($appointment, $intent) {
+        $appointment->status = 'accepted';
+        $appointment->save();
+
+        if ($appointment->slot) {
+          $appointment->slot->is_booked = 1;
+          $appointment->slot->save();
+        }
+
+        Payment::create([
+          'user_id' => auth()->id(),
+          'appointment_id' => $appointment->id,
+          'transaction_id' => $intent->id,
+          'amount' => $intent->amount / 100,
+          'payment_method' => 'stripe',
+          'status' => 'success'
+        ]);
+      });
+
+      dispatch(new NotifyDoctorAndPatient($appointment));
+
+      return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+      \Log::error('Payment Success Error: ' . $e->getMessage());
       return response()->json([
-        'clientSecret' => $paymentIntent->client_secret
-      ]);
-    } catch (ApiErrorException $e) {
-      return response()->json([
-        'error' => $e->getMessage()
+        'success' => false,
+        'message' => 'Something went wrong while confirming your payment.'
       ], 500);
     }
   }
 
-  public function success(Request $request)
-  {
-    // Verify payment and complete appointment booking
-    $paymentIntentId = $request->query('payment_intent');
-
-    try {
-      $paymentIntent = $this->stripe->paymentIntents->retrieve($paymentIntentId);
-
-      if ($paymentIntent->status === 'succeeded') {
-        // Get appointment data from session or database temp storage
-        // Complete the appointment booking process
-
-        return view('payment.success', [
-          'appointment' => $appointment,
-          'payment' => $paymentIntent
-        ]);
-      }
-
-      return redirect()->route('appointments.index')->with('error', 'Payment not completed.');
-    } catch (ApiErrorException $e) {
-      return redirect()->route('appointments.index')->with('error', $e->getMessage());
-    }
-  }
 }

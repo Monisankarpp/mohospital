@@ -95,7 +95,7 @@
 
                                 <!-- Breaks Section -->
                                 <div class="mb-5">
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                    {{-- <div class="d-flex justify-content-between align-items-center mb-4">
                                         <div class="d-flex align-items-center">
                                             <div class="bg-warning bg-opacity-10 text-warning rounded-3 p-2 me-3">
                                                 <i class="fas fa-coffee fs-5"></i>
@@ -105,7 +105,7 @@
                                         <button type="button" class="btn btn-primary rounded-pill px-4" id="add-break">
                                             <i class="fas fa-plus me-1"></i> Add Break
                                         </button>
-                                    </div>
+                                    </div> --}}
 
                                     <div id="breaks-container" class="row g-3">
                                         <!-- Dynamic breaks will be added here -->

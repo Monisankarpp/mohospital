@@ -14,7 +14,7 @@ class AppointmentController extends Controller
     $appointments = Appointment::with(['slot.doctor.user'])
       ->where('patient_id', Auth::id())
       ->orderBy('date', 'desc')
-      ->paginate(10);
+      ->paginate(7);
 
     return view('patient.appointments', compact('appointments'));
   }

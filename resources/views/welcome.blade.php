@@ -4,11 +4,21 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>MoHospital - Modern Healthcare Solutions</title>
     <meta name="description"
         content="MoHospital connects patients with top doctors, hospitals, and medical services for comprehensive healthcare solutions.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Popper + Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
     <style>
         :root {
             --primary-blue: #004e92;
@@ -658,6 +668,10 @@
                         </div>
 
                         <!-- Time Slot Section -->
+                        <input type="hidden" id="selectedTimeSlot" name="slot_id">
+                        <input type="hidden" id="selectedStartTime" name="start_time">
+                        <input type="hidden" id="selectedEndTime" name="end_time">
+
                         <div class="px-4 pt-2">
                             <div class="bg-white rounded-3 shadow-sm p-3 mb-3 border">
                                 <h6 class="mb-3 fw-semibold text-dark">
@@ -737,6 +751,115 @@
         </div>
     </div>
 
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <!-- Modal Header -->
+                <div class="modal-header border-0 py-4"
+                    style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">
+                    <h5 class="modal-title text-white fw-semibold">Review Appointment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body bg-gray-50 px-4 pt-4">
+                    <div class="card border-0 shadow-sm rounded-3 mb-4">
+                        <div class="card-header bg-white border-0 py-3">
+                            <h6 class="mb-0 fw-semibold"><i class="fas fa-receipt me-2 text-primary"></i>Appointment
+                                Summary</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><span class="text-muted">Doctor:</span></p>
+                                    <p class="fw-semibold" id="reviewDoctorName">Loading...</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><span class="text-muted">Date:</span></p>
+                                    <p class="fw-semibold" id="reviewDate">-</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><span class="text-muted">Time:</span></p>
+                                    <p class="fw-semibold" id="reviewTime">-</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><span class="text-muted">Fee:</span></p>
+                                    <p class="fw-semibold" id="reviewFee">$100</p>
+                                </div>
+                                <div class="col-12">
+                                    <p class="mb-1"><span class="text-muted">Notes:</span></p>
+                                    <p class="fw-semibold" id="reviewNotes">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="mb-3 fw-semibold"><i class="fas fa-credit-card me-2 text-primary"></i>Payment
+                            Method</h6>
+                        <div id="card-element" class="form-control p-3 rounded-3 shadow-sm border"></div>
+                        <div id="card-errors" class="text-danger small mt-2" role="alert"></div>
+
+                        <!-- Payment security badges -->
+                        <div class="d-flex justify-content-center gap-3 mt-3">
+                            <!-- Stripe -->
+                            <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/stripe.svg" width="40"
+                                alt="Stripe" title="Stripe">
+                            <!-- Visa -->
+                            <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/visa.svg" width="40"
+                                alt="Visa" title="Visa">
+                            <!-- Mastercard -->
+                            <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/mastercard.svg"
+                                width="40" alt="Mastercard" title="Mastercard">
+
+                        </div>
+                    </div>
+                    <div class="alert alert-warning border-0 rounded-3 d-flex align-items-center">
+                        <i class="fas fa-clock me-3 fs-4"></i>
+                        <div>
+                            <h6 class="mb-1 fw-semibold">Time remaining</h6>
+                            <p class="mb-0">
+                                <span id="paymentTimer" class="fw-bold">29:59</span> to complete payment
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer bg-gray-50 border-0 px-4 pb-4 pt-3">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4 py-2"
+                        data-bs-dismiss="modal">
+                        <i class="fas fa-arrow-left me-2"></i> Back to booking
+                    </button>
+                    <button id="payNowBtn" class="btn btn-success rounded-pill px-4 py-2 shadow-sm"
+                        data-appointment-id="">
+                        <i class="fas fa-lock me-2"></i> Pay <span id="paymentAmount">$100</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Success Model --}}
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content text-center border-0 rounded-4 shadow-lg">
+                <div class="modal-body py-5">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h5 class="fw-bold mb-2">Payment Successful!</h5>
+                    <p class="text-muted">Appointment is confirmed. You’ll receive an email shortly.</p>
+                    <button class="btn btn-success rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <!-- Testimonials -->
     <section id="about" class="py-5 my-5">
@@ -753,7 +876,8 @@
                                 <small class="text-muted">Heart Patient</small>
                             </div>
                         </div>
-                        <p>"MoHospital connected me with the perfect cardiologist. The online booking system saved me
+                        <p>"MoHospital connected me with the perfect cardiologist. The online booking system saved
+                            me
                             hours of waiting time. Highly recommended!"</p>
                         <div class="text-warning">
                             <i class="fas fa-star"></i>
@@ -774,7 +898,8 @@
                                 <small class="text-muted">Diabetes Patient</small>
                             </div>
                         </div>
-                        <p>"The pharmacy service is a game-changer. My medications arrive on time every month without
+                        <p>"The pharmacy service is a game-changer. My medications arrive on time every month
+                            without
                             fail. Excellent customer support too."</p>
                         <div class="text-warning">
                             <i class="fas fa-star"></i>
@@ -819,6 +944,8 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
     <script>
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -926,6 +1053,8 @@
                         btn.addEventListener('click', () => {
                             console.log('Slot selected:', slot.id);
                             document.getElementById('selectedTimeSlot').value = slot.id;
+                            document.getElementById('selectedStartTime').value = slot.start_time;
+                            document.getElementById('selectedEndTime').value = slot.end_time;
 
                             document.querySelectorAll('.time-slots-wrapper button').forEach(b => b
                                 .classList.remove('active'));
@@ -954,6 +1083,202 @@
                     behavior: 'smooth'
                 });
             });
+
+        });
+
+        // Payment model
+        document.addEventListener('DOMContentLoaded', function() {
+            let timerDuration = 30 * 60; // 30 minutes in seconds
+            const timerDisplay = document.getElementById('paymentTimer');
+
+            const countdown = setInterval(() => {
+                const minutes = Math.floor(timerDuration / 60);
+                const seconds = timerDuration % 60;
+
+                timerDisplay.textContent =
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (timerDuration <= 0) {
+                    clearInterval(countdown);
+                    timerDisplay.textContent = '00:00';
+                    alert('Payment time expired!');
+                    // Optionally disable payment button or close modal
+                    document.getElementById('payNowBtn').disabled = true;
+                }
+
+                timerDuration--;
+            }, 1000);
+            // Handle slot selection
+            document.querySelectorAll('.slot-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove(
+                        'selected'));
+                    button.classList.add('selected');
+
+                    document.getElementById('selectedTimeSlot').value = button.dataset.slotId;
+                    document.getElementById('selectedStartTime').value = button.dataset.startTime;
+                    document.getElementById('selectedEndTime').value = button.dataset.endTime;
+
+                    document.getElementById('confirmBookingBtn').disabled = false;
+                });
+            });
+
+            // Intercept form submit and show payment modal
+            document.getElementById('bookingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const selectedSlotId = document.getElementById('selectedTimeSlot').value;
+                const notes = document.getElementById('patientNotes').value || '-';
+                const doctorName = document.getElementById('modalDoctorName').textContent.trim();
+                const date = document.getElementById('selectedDate').value;
+                const startTime = document.getElementById('selectedStartTime').value;
+                const endTime = document.getElementById('selectedEndTime').value;
+                const time = `${startTime} - ${endTime}`;
+
+                // Populate preview in payment modal
+                document.getElementById('reviewDoctorName').textContent = doctorName;
+                document.getElementById('reviewDate').textContent = date;
+                document.getElementById('reviewTime').textContent = time;
+                document.getElementById('reviewNotes').textContent = notes;
+                document.getElementById('reviewFee').textContent = '$100';
+
+                // Step 1: Create temporary appointment
+                fetch('/appointment/prepare', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            slot_id: selectedSlotId,
+                            notes: notes
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        const appointmentId = data.appointment_id;
+
+                        // Step 2: Store appointmentId for Stripe payment
+                        document.getElementById('payNowBtn').dataset.appointmentId = appointmentId;
+
+                        // Step 3: Show payment modal
+                        const paymentModal = new bootstrap.Modal(document.getElementById(
+                            'paymentModal'), {
+                            backdrop: false
+                        });
+                        paymentModal.show();
+
+                        // Step 4: Hide booking modal
+                        bootstrap.Modal.getInstance(document.getElementById('bookModal')).hide();
+                    })
+                    .catch(error => {
+                        console.error("Failed to prepare appointment:", error);
+                        alert("Failed to prepare appointment. Please try again.");
+                    });
+            });
+
+            // Reopen booking modal if payment modal closed
+            document.getElementById('paymentModal').addEventListener('hidden.bs.modal', function() {
+                new bootstrap.Modal(document.getElementById('bookModal')).show();
+            });
+            // this is DOMContentLoaded
+
+
+
+            // Handle "Pay Now" click
+
+            let stripe = Stripe("{{ config('services.stripe.key') }}");
+            let elements = stripe.elements();
+            let cardElement = elements.create('card');
+            cardElement.mount('#card-element');
+
+            document.getElementById('payNowBtn').addEventListener('click', function() {
+                // Fetch client secret from server
+                const appointmentId = document.getElementById('payNowBtn').dataset.appointmentId;
+
+                fetch('/payment/create-intent', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            appointment_id: appointmentId
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        stripe.confirmCardPayment(data.client_secret, {
+                            payment_method: {
+                                card: cardElement
+                            }
+                        }).then(result => {
+                            if (result.error) {
+                                alert(result.error.message);
+                            } else {
+                                // Payment succeeded
+                                fetch('/payment/success', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Accept': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector(
+                                                'meta[name="csrf-token"]').getAttribute(
+                                                'content')
+                                        },
+                                        body: JSON.stringify({
+                                            appointment_id: data.appointment_id,
+                                            payment_intent_id: result.paymentIntent
+                                                .id
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(response => {
+                                        if (response.success) {
+                                            $('#paymentModal').modal('hide');
+                                            $('#bookModal').modal('hide');
+
+                                            Swal.fire({
+                                                title: 'Appointment Booked!',
+                                                text: 'Your appointment has been successfully confirmed.',
+                                                icon: 'success',
+                                                confirmButtonText: 'Okay',
+                                                timer: 3000,
+                                                timerProgressBar: true
+                                            }).then(() => {
+                                                // Optional redirect
+                                                window.location.href =
+                                                    '/';
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                title: 'Payment Failed',
+                                                text: response.message ||
+                                                    'There was an issue verifying your payment.',
+                                                icon: 'error',
+                                                confirmButtonText: 'Try Again'
+                                            });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        Swal.fire({
+                                            title: 'Oops!',
+                                            text: 'Something went wrong while booking the appointment.',
+                                            icon: 'error',
+                                            confirmButtonText: 'Close'
+                                        });
+                                    });
+
+                            }
+                        });
+                    });
+            });
+
 
         });
     </script>

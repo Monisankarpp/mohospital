@@ -113,7 +113,7 @@
                 </li>
 
                 <li class="nav-item mb-2">
-                    <a href=""
+                    <a href="{{ route('doctor.my-patients') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.patients*') ? 'active' : 'text-white-50' }}">
                         <div class="icon-wrapper me-3 bg-danger bg-opacity-10">
                             <i class="fas fa-user-injured text-danger"></i>
