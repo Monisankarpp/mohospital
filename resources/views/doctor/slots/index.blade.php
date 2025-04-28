@@ -21,12 +21,6 @@
                 </div>
             </div>
 
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-
             <div class="card mb-4">
                 <div class="card-header">
                     <h4>Weekly Schedule</h4>

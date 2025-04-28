@@ -29,7 +29,7 @@ class DashboardController extends Controller
     $latestPrescription = Prescription::with(['doctor.user']) // assuming doctor has 'user' relation
       ->where('patient_id', auth()->id())
       ->latest()
-      ->skip(1)
+      // ->skip(1)
       ->first();
 
     return view('patient.dashboard', compact('appointments', 'latestPrescription'));

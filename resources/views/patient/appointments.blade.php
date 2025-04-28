@@ -17,7 +17,7 @@
             </div>
 
             <div class="card-body p-0">
-                <div class="table-responsive">
+                <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
                     <table class="table table-borderless align-middle mb-0">
                         <thead class="sticky-top" style="top: -1px; background: linear-gradient(145deg, #f1f3ff, #e6e9ff);">
                             <tr>
@@ -79,7 +79,7 @@
                                                 'rescheduled' => ['#1e90ff', 'rgba(30, 144, 255, 0.1)', 'fa-sync-alt'],
                                             ];
 
-                                            $status = strtolower($appointment->status);
+                                            $status = strtolower($appointment->status); // just to be safe
                                             $color = $statusColors[$status][0] ?? '#ccc';
                                             $bg = $statusColors[$status][1] ?? 'rgba(0,0,0,0.05)';
                                             $icon = $statusColors[$status][2] ?? 'fa-question-circle';
@@ -90,7 +90,7 @@
                                         </span>
                                     </td>
                                     <td class="pe-4 py-3 text-end">
-                                        <a href="#" class="btn btn-sm rounded-pill px-3 py-2"
+                                        <a href="" class="btn btn-sm rounded-pill px-3 py-2"
                                             style="background: rgba(108, 92, 231, 0.1); color: #6c5ce7; border: none; font-weight: 500;">
                                             $ 100
                                         </a>
@@ -103,10 +103,6 @@
                             @endforelse
                         </tbody>
                     </table>
-
-                    <div class="d-flex justify-content-center px-4 py-4">
-                        {{ $appointments->links('pagination::bootstrap-5') }}
-                    </div>
                 </div>
             </div>
         </div>
