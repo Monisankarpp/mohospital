@@ -9,6 +9,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ChatController;
 
 
 
@@ -26,8 +27,6 @@ use App\Http\Controllers\Doctor\{
     PrescriptionController as DoctorPrescriptionController,
     PatientController as DoctorPatientController,
     SlotController,
-    SlotSetupController,
-    ScheduleController,
 };
 
 Route::get('/', function () {
@@ -45,8 +44,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-
 
 
 Route::controller(ForgotPasswordController::class)
@@ -78,22 +75,18 @@ Route::middleware(['role:patient'])->prefix('patient')->name('patient.')->group(
 
     Route::get('/prescription/{id}', [PatientPrescriptionController::class, 'show'])->name('prescriptions.show');
     Route::get('/prescriptions', [PatientPrescriptionController::class, 'index'])->name('prescriptions');
+
+    Route::get('/appointments/{id}/edit', [PatientAppointmentController::class, 'edit'])->name('appointments.edit');
+    Route::post('/appointments/{id}/update', [PatientAppointmentController::class, 'update'])->name('appointments.update');
+    Route::get('/appointments/{id}/view', [PatientAppointmentController::class, 'show'])->name('appointments.view');
+
+
+
 });
 
 // --------------------
 // Doctor Routes
 // --------------------
-// Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
-//     Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('dashboard');
-//     Route::controller(DoctorProfileController::class)->group(function () {
-//         Route::get('/profile', 'index')->name('profile');
-//         Route::post('/profile/update', 'update')->name('profile.update');
-//     });
-//     Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('appointments');
-//     Route::get('/prescription-upload', [DoctorPrescriptionController::class, 'index'])->name('prescription.upload');
-//     Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
-//     // Route::resource('slots', SlotController::class);
-// });
 
 Route::middleware(['role:doctor'])
     ->prefix('doctor')
@@ -118,44 +111,20 @@ Route::middleware(['role:doctor'])
 
     });
 
-
 Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
 Route::get('/generate-invoice/{id}', [InvoiceController::class, 'generatePDF'])->name('generate.invoice');
 
 Route::get('/invoice/view/{id}', [InvoiceController::class, 'view'])->name('invoices.show');
 
-
-
-// Route::middleware(['auth'])->group(function () {
 Route::get('/', [DoctorController::class, 'index'])->name('doctors.index');
-// Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
-// });
 
 Route::get('/get-available-dates/{doctor}', [App\Http\Controllers\DoctorController::class, 'getAvailableDates']);
-
 
 Route::post('/appointments/book', [DoctorController::class, 'book'])->name('appointments.book');
 
 Route::middleware('role:patient')->post('/payment/create-intent', [PaymentController::class, 'createPaymentIntent']);
 Route::middleware('role:patient')->post('/payment/success', [PaymentController::class, 'paymentSuccess']);
-
-// routes/web.php
-// Route::middleware(['role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
-//     // First-time setup
-//     Route::get('slots/setup', [SlotSetupController::class, 'create'])->name('slots.setup');
-//     Route::post('slots/setup', [SlotSetupController::class, 'store'])->name('slots.store');
-
-//     // Schedule management
-//     Route::get('schedule', [ScheduleController::class, 'index'])->name('schedule.index');
-//     Route::get('slots/{slot}/edit', [ScheduleController::class, 'edit'])->name('slots.edit');
-//     Route::put('slots/{slot}', [ScheduleController::class, 'update'])->name('slots.update');
-//     Route::delete('slots/{slot}', [ScheduleController::class, 'destroy'])->name('slots.destroy');
-
-//     // Schedule reuse confirmation
-//     Route::post('schedule/confirm', [ScheduleController::class, 'confirmReuseSchedule'])
-//         ->name('schedule.confirm');
-// });
 
 Route::middleware(['doctor.first.login'])->group(function () {
     Route::view('/doctor/first-login', 'doctor.first-login');
@@ -166,7 +135,6 @@ Route::get('/doctor/message-patient/{patient_id}', [DoctorController::class, 'me
 
 Route::post('/appointment/prepare', [\App\Http\Controllers\AppointmentControllerForID::class, 'prepare']);
 
-// Route::middleware(['auth', 'verified'])->group(function () {
 // Doctor routes
 Route::prefix('doctor')->as('doctor.')->middleware('role:doctor')->group(function () {
     Route::resource('slots', SlotController::class)->except(['show']);
@@ -174,7 +142,7 @@ Route::prefix('doctor')->as('doctor.')->middleware('role:doctor')->group(functio
         ->name('slots.apply-default');
 });
 
-// });
-
-
 Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+
+Route::post('/api/chat', [ChatController::class, 'chat']);
+Route::view('/chat', 'chat');

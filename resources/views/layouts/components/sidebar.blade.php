@@ -71,7 +71,7 @@
                 <li class="nav-item mb-2">
                     <a href="{{ route('doctor.dashboard') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.dashboard') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-primary bg-opacity-10">
+                        <div class="icon-wrapper me-3 bg-primary bg-opacity-10 rounded-circle p-2">
                             <i class="fas fa-tachometer-alt text-primary"></i>
                         </div>
                         <span class="fw-medium">Dashboard</span>
@@ -82,7 +82,7 @@
                 <li class="nav-item mb-2">
                     <a href="{{ route('doctor.prescription.upload') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.prescription.upload') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-success bg-opacity-10">
+                        <div class="icon-wrapper me-3 bg-success bg-opacity-10 rounded-circle p-2">
                             <i class="fas fa-file-medical text-success"></i>
                         </div>
                         <span class="fw-medium">Prescriptions</span>
@@ -93,7 +93,7 @@
                 <li class="nav-item mb-2">
                     <a href="{{ route('doctor.appointments') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.appointments*') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-warning bg-opacity-10">
+                        <div class="icon-wrapper me-3 bg-warning bg-opacity-10 rounded-circle p-2">
                             <i class="fas fa-calendar-check text-warning"></i>
                         </div>
                         <span class="fw-medium">Appointments</span>
@@ -104,7 +104,7 @@
                 <li class="nav-item mb-2">
                     <a href="{{ route('doctor.slots.index') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.slots*') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-info bg-opacity-10">
+                        <div class="icon-wrapper me-3 bg-info bg-opacity-10 rounded-circle p-2">
                             <i class="fas fa-clock text-info"></i>
                         </div>
                         <span class="fw-medium">Slots</span>
@@ -115,7 +115,7 @@
                 <li class="nav-item mb-2">
                     <a href="{{ route('doctor.my-patients') }}"
                         class="nav-link rounded-3 px-3 py-3 d-flex align-items-center sidebar-item {{ request()->routeIs('doctor.patients*') ? 'active' : 'text-white-50' }}">
-                        <div class="icon-wrapper me-3 bg-danger bg-opacity-10">
+                        <div class="icon-wrapper me-3 bg-danger bg-opacity-10 rounded-circle p-2">
                             <i class="fas fa-user-injured text-danger"></i>
                         </div>
                         <span class="fw-medium">Patients</span>

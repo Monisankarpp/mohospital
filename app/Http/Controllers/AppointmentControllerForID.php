@@ -19,17 +19,15 @@ class AppointmentControllerForID extends Controller
 
         $slot = Slot::findOrFail($validated['slot_id']);
 
-        // Optional: prevent duplicate bookings
         if ($slot->status === 1) {
             return response()->json(['message' => 'Slot already booked'], 409);
         }
 
         // Create a new appointment with pending status
         $appointment = Appointment::create([
-            'patient_id' => Auth::id(), // Or pass patient_id if available
+            'patient_id' => Auth::id(),
             'slot_id' => $slot->id,
-            'status' => 'pending', // Set a default status
-
+            'status' => 'pending',
         ]);
 
         return response()->json([

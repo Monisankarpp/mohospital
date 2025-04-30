@@ -41,10 +41,6 @@ class Slot extends Model
     {
         return $this->belongsTo(DoctorSchedule::class, 'doctor_schedule_id');
     }
-    // public function isEditable()
-    // {
-    //     return !$this->is_booked && $this->start_time->diffInHours(now()) < 24;
-    // }
     public function isEditable(): bool
     {
         return now()->lt($this->can_edit_until);

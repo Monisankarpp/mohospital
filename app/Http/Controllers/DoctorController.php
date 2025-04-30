@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\DoctorMessageMail;
 use App\Jobs\SendDoctorMessageEmail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 
 class DoctorController extends Controller

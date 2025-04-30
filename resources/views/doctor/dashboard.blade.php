@@ -120,7 +120,7 @@
                             @forelse ($appointmentsToday as $appointment)
                                 <tr class="border-top border-light">
                                     <td class="ps-4 py-3 text-dark">
-                                        {{ \Carbon\Carbon::parse($appointment->slot->start_time)->format('h:i A') }}
+                                        {{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }}
                                     </td>
                                     <td class="py-3">
                                         <div>
@@ -246,26 +246,3 @@
 
     </div>
 @endsection
-
-<style>
-    .bg-soft-primary {
-        background-color: rgba(13, 110, 253, 0.1);
-    }
-
-    .bg-soft-success {
-        background-color: rgba(25, 135, 84, 0.1);
-    }
-
-    .bg-soft-info {
-        background-color: rgba(13, 202, 240, 0.1);
-    }
-
-    .bg-soft-warning {
-        background-color: rgba(255, 193, 7, 0.1);
-    }
-
-    .hover-scale:hover {
-        transform: scale(1.03);
-        transition: all 0.2s ease-in-out;
-    }
-</style>

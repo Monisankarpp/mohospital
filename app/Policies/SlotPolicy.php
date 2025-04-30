@@ -29,13 +29,11 @@ class SlotPolicy
     {
         return $user->hasRole('doctor') &&
             $slot->doctor_id === $user->doctor->id;
-        // $slot->isEditable();
     }
 
     public function delete(User $user, Slot $slot)
     {
         return $user->hasRole('doctor') &&
             $slot->doctor_id === $user->doctor->id;
-        // $slot->isEditable();
     }
 }

@@ -6,6 +6,8 @@ namespace App\Providers;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -32,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
             $view->with('role', $role);
         });
         $this->registerPolicies();
+        Gate::define('isPatient', function (User $user) {
+            return $user->role === 'patient';
+        });
 
     }
 }

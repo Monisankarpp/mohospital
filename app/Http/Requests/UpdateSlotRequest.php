@@ -43,15 +43,4 @@ class UpdateSlotRequest extends FormRequest
             ]
         ];
     }
-
-    // public function messages(): array
-    // {
-    //     return [
-    //         'start_time.required' => 'Start time is required.',
-    //         'start_time.date_format' => 'Start time must be in HH:MM format.',
-    //         'end_time.required' => 'End time is required.',
-    //         'end_time.date_format' => 'End time must be in HH:MM format.',
-    //         'end_time.after' => 'End time must be after start time.',
-    //     ];
-    // }
 }
