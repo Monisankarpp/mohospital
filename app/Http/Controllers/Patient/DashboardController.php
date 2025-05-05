@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Patient;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\Prescription;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Slot;
-
-
+use App\Models\Doctor;
+use App\Jobs\SendRescheduleEmail;
 
 
 class DashboardController extends Controller
@@ -19,6 +20,7 @@ class DashboardController extends Controller
   {
     $appointments = Appointment::with(['slot.doctor.user'])
       ->where('patient_id', Auth::id())
+      ->where('status', '!=', 'completed')
       ->whereHas('slot', function ($query) {
         $query->where('start_time', '>=', Carbon::now());
       })
@@ -37,25 +39,62 @@ class DashboardController extends Controller
       ->where('start_time', '>=', Carbon::now())
       ->get();
 
-    return view('patient.dashboard', compact('appointments', 'latestPrescription', 'availableSlots'));
+    $messageCount = Notification::where('user_id', auth()->id())->count();
+
+
+    return view('patient.dashboard', compact('appointments', 'latestPrescription', 'availableSlots', 'messageCount'));
   }
 
-  public function update(Request $request, $id)
+  public function getAvailableSlots(Doctor $doctor)
   {
-    $appointment = Appointment::findOrFail($id);
+    $slots = $doctor->slots()
+      ->whereDoesntHave('appointment') // exclude booked
+      ->where('date', '>=', now()->toDateString())
+      ->orderBy('start_time')
+      ->get(['id', 'start_time', 'end_time']);
 
-    // Ensure at least 24 hours difference
-    $current = Carbon::now()->addHours(24);
-    $appointmentTime = Carbon::parse($request->date . ' ' . $appointment->slot->start_time);
+    return response()->json($slots);
+  }
 
-    if ($current->gt($appointmentTime)) {
-      return back()->with('error', 'Appointments can only be edited at least 24 hours in advance.');
+  public function reschedule(Request $request, Appointment $appointment)
+  {
+    $request->validate([
+      'slot_id' => 'required|exists:slots,id',
+    ]);
+
+    $newSlot = Slot::where('id', $request->slot_id)
+      ->where('doctor_id', $appointment->slot->doctor_id)
+      ->whereDoesntHave('appointment')
+      ->first();
+
+    if (!$newSlot) {
+      return response()->json(['success' => false, 'message' => 'The selected slot is not available.']);
     }
 
-    $appointment->date = $request->date;
-    $appointment->slot_id = $request->slot_id;
-    $appointment->save();
+    $oldSlot = $appointment->slot;
+    if ($oldSlot) {
+      $oldSlot->update([
+        'is_booked' => 0,
+        'status' => 'available',
+      ]);
+    }
 
-    return redirect()->back()->with('success', 'Appointment updated successfully!');
+    $appointment->update([
+      'slot_id' => $newSlot->id,
+      'status' => 'rescheduled',
+    ]);
+
+    $newSlot->update([
+      'is_booked' => 1,
+      'status' => 'booked',
+
+    ]);
+
+    $appointment->load(['patient', 'slot.doctor.user']);
+    SendRescheduleEmail::dispatch($appointment);
+
+    return response()->json(['success' => true, 'message' => 'Appointment successfully rescheduled.']);
   }
+
+
 }

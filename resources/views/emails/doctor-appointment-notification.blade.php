@@ -17,5 +17,5 @@
     @endcomponent
 
     Regards,
-    {{ config('app.name') }}
+    Mo-Hospital
 @endcomponent

@@ -14,14 +14,15 @@
                         <span class="input-group-text bg-white border-end-0">
                             <i class="fas fa-search text-muted"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0" placeholder="Search patients...">
+                        <input type="text" class="form-control border-start-0" id="searchInput"
+                            placeholder="Search patients...">
                     </div>
                 </div>
             </div>
 
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0" id="patientsTable">
                         <thead class="bg-light">
                             <tr>
                                 <th class="ps-4 text-uppercase small fw-bold text-muted">Patient</th>
@@ -33,7 +34,8 @@
                         </thead>
                         <tbody>
                             @forelse ($recentPatients as $appointment)
-                                <tr class="border-top">
+                                <tr class="patient-row" data-patient="{{ strtolower($appointment->patient->name) }}"
+                                    data-date="{{ $appointment->created_at->format('M d, Y') }}">
                                     <td class="ps-4 py-3">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-sm me-3">
@@ -67,7 +69,6 @@
                                                 class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                                 <i class="fas fa-comment-medical me-1"></i>Message
                                             </a>
-
                                         </div>
                                     </td>
                                 </tr>
@@ -90,14 +91,32 @@
             <div class="card-footer bg-white border-0 py-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="text-muted small">
-                        {{-- Showing {{ $recentPatients->firstItem() ?? 0 }} to {{ $recentPatients->lastItem() ?? 0 }} of
-                            {{ $recentPatients->total() ?? 0 }} entries --}}
+                        Showing {{ $recentPatients->firstItem() ?? 0 }} to {{ $recentPatients->lastItem() ?? 0 }} of
+                        {{ $recentPatients->total() ?? 0 }} entries
                     </div>
                     <div>
-                        {{-- {{ $recentPatients->links('pagination::bootstrap-5') }} --}}
+                        {{ $recentPatients->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.patient-row');
+
+            rows.forEach(row => {
+                const patientName = row.getAttribute('data-patient');
+                const lastVisitDate = row.getAttribute('data-date');
+
+                if (patientName.includes(query) || lastVisitDate.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
 @endsection

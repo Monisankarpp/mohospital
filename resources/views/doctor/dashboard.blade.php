@@ -129,26 +129,31 @@
                                         </div>
                                     </td>
                                     <td class="py-3">
-                                        <span
-                                            class="badge bg-soft-primary text-primary rounded-pill px-3 py-1">Consultation</span>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-1">
+                                            Consultation
+                                        </span>
+
                                     </td>
                                     <td class="py-3">
                                         <span
-                                            class="badge bg-soft-success text-success rounded-pill px-3 py-1 
-                                            {{ $appointment->status === 'confirmed'
-                                                ? 'bg-soft-success text-success'
-                                                : ($appointment->status === 'pending'
-                                                    ? 'bg-soft-warning text-warning'
-                                                    : ($appointment->status === 'cancelled'
-                                                        ? 'bg-soft-danger text-danger'
-                                                        : 'bg-secondary text-white')) }}">
+                                            class="badge rounded-pill px-3 py-1
+                                                {{ $appointment->status === 'completed'
+                                                    ? 'bg-success bg-opacity-10 text-success'
+                                                    : ($appointment->status === 'accepted'
+                                                        ? 'bg-warning bg-opacity-10 text-warning'
+                                                        : ($appointment->status === 'rescheduled'
+                                                            ? 'bg-danger bg-opacity-10 text-danger'
+                                                            : 'bg-secondary text-white')) }}">
                                             {{ ucfirst($appointment->status) }}
                                         </span>
                                     </td>
                                     <td class="pe-4 py-3 text-end">
-                                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3 hover-scale">
+                                        <button
+                                            class="btn btn-sm btn-outline-primary rounded-pill px-3 hover-scale btn-start-appointment"
+                                            data-id="{{ $appointment->id }}">
                                             <i class="fas fa-play me-1"></i> Start
                                         </button>
+
                                     </td>
                                 </tr>
                             @empty
@@ -164,8 +169,6 @@
                 </div>
             </div>
         </div>
-
-
 
         <!-- Recent Patients -->
         <div class="card border-0 shadow-sm rounded-4">
@@ -207,15 +210,16 @@
                                     </td>
                                     <td class="py-3 text-muted">{{ $appointment->created_at->diffForHumans() }}</td>
                                     <td class="py-3">
-                                        <span class="bg-soft-danger text-danger rounded-pill px-3 py-1">
+                                        <span class="bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-1">
                                             Fever
                                         </span>
                                     </td>
                                     <td class="py-3">
-                                        <span class="bg-soft-danger text-success rounded-pill px-3 py-1">
+                                        <span class="bg-success bg-opacity-10 text-success rounded-pill px-3 py-1">
                                             $ 100
                                         </span>
                                     </td>
+
                                     <td class="pe-4 py-3 text-end">
                                         <a href="{{ route('doctor.message.patient', ['patient_id' => $appointment->patient->id]) }}"
                                             class="btn btn-sm btn-outline-success rounded-pill px-3 hover-scale">
@@ -243,6 +247,71 @@
             </div>
         </div>
 
-
     </div>
+
+    <script>
+        document.querySelectorAll('.btn-start-appointment').forEach(button => {
+            button.addEventListener('click', function() {
+                const appointmentId = this.dataset.id;
+
+
+                Swal.fire({
+                    title: 'Complete Appointment?',
+                    text: 'Do you want to mark this appointment as completed and send the prescription?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, complete it',
+                    cancelButtonText: 'Cancel',
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return fetch(`/doctor/appointments/${appointmentId}/complete`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({})
+                            })
+                            .then(res => {
+                                if (!res.ok) {
+                                    throw new Error(res.statusText);
+                                }
+                                return res.json();
+                            })
+                            .then(data => {
+                                if (!data.success) {
+                                    throw new Error(data.message || 'Completion failed');
+                                }
+                                return data;
+                            })
+                            .catch(error => {
+                                Swal.showValidationMessage(`Request failed: ${error}`);
+                            });
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        // Delay for animation effect
+                        setTimeout(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Completed!',
+                                text: 'Appointment marked as completed and email sent.',
+                                showClass: {
+                                    popup: 'animate__animated animate__fadeInDown'
+                                },
+                                hideClass: {
+                                    popup: 'animate__animated animate__fadeOutUp'
+                                }
+                            }).then(() => location.reload());
+                        }, 300); // slight delay for smoother experience
+                    }
+                });
+
+
+
+            });
+        });
+    </script>
+
 @endsection

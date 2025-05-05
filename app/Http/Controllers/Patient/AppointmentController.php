@@ -32,4 +32,21 @@ class AppointmentController extends Controller
 
 		return view('patient.appointments', compact('appointment'));
 	}
+
+
+	public function reschedule(Request $request, $id)
+	{
+		$request->validate([
+			'new_date' => 'required|date',
+			'new_time' => 'required'
+		]);
+
+		$appointment = Appointment::findOrFail($id);
+		$appointment->date = $request->input('new_date');
+		$appointment->slot->start_time = $request->input('new_time');
+		$appointment->save();
+
+		return response()->json(['message' => 'Appointment rescheduled']);
+	}
+
 }

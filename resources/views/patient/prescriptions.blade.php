@@ -3,103 +3,167 @@
 
 @section('dashboard-content')
     <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
-        <!-- Header Section -->
-        <div class="d-flex justify-content-between align-items-center mb-5">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-light mb-1 text-primary">
-                    <i class="fas fa-prescription-bottle-alt me-2"></i> My Prescriptions
+                <h2 class="text-primary fw-semibold mb-1">
+                    <i class="fas fa-prescription-bottle-alt me-2 text-info"></i> My Prescriptions
                 </h2>
-                <p class="text-muted small">Your current and past medication records</p>
+                <p class="text-muted small mb-0">View all your past and active medication records here.</p>
             </div>
         </div>
 
-        <!-- Prescriptions Table -->
-        <div class="card border-0 shadow-xs overflow-hidden">
-            <div class="card-header bg-white border-0 pt-4 pb-3 px-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 text-primary">
-                        <i class="fas fa-history me-2"></i> Prescription History
-                    </h5>
-                </div>
+        <!-- Prescription Card -->
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                <h5 class="mb-0 text-dark">
+                    <i class="fas fa-history me-2 text-secondary"></i> Prescription History
+                </h5>
             </div>
 
-            <div class="card-body px-0 pt-0">
-                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="sticky-top bg-white" style="top: -1px; z-index: 10;">
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small text-uppercase sticky-top" style="z-index: 1; top: 0;">
+                        <tr class="border-bottom fw-semibold">
+                            <th class="ps-4 py-3">Doctor</th>
+                            <th class="py-3">Date</th>
+                            <th class="py-3">Medications</th>
+                            <th class="py-3">Status</th>
+                            <th class="pe-4 py-3 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($prescriptions as $prescription)
                             <tr class="border-bottom">
-                                <th class="ps-4 py-3 text-muted small text-uppercase fw-semibold">Prescribed By</th>
-                                <th class="py-3 text-muted small text-uppercase fw-semibold">Date</th>
-                                <th class="py-3 text-muted small text-uppercase fw-semibold">Medications</th>
-                                <th class="py-3 text-muted small text-uppercase fw-semibold">Status</th>
-                                <th class="pe-4 py-3 text-muted small text-uppercase fw-semibold text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($prescriptions as $prescription)
-                                <tr class="border-bottom hover-highlight">
-                                    <td class="ps-4 py-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar avatar-md bg-soft-teal text-teal rounded-circle me-3">
-                                                <i class="fas fa-user-md"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 fw-semibold">{{ $prescription->doctor->user->name }}</h6>
-                                                <small class="text-muted">{{ 'Main Hospital' }}</small>
-                                            </div>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-3"
+                                            style="width: 42px; height: 42px;">
+                                            <i class="fas fa-user-md"></i>
                                         </div>
-                                    </td>
-                                    <td class="py-3">
-                                        <span
-                                            class="d-block fw-medium">{{ \Carbon\Carbon::parse($prescription->date)->format('M d, Y') }}</span>
-                                        <small
-                                            class="text-muted">{{ \Carbon\Carbon::parse($prescription->date)->format('h:i A') }}</small>
-                                    </td>
-                                    <td class="py-3">
-                                        <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-1">
-                                            <i class="fas fa-pills me-1"></i> {{ $prescription->medications }} Medications
-                                        </span>
-                                    </td>
-                                    <td class="py-3">
-                                        <span
-                                            class="badge bg-soft-{{ 'Active' == 'Active' ? 'success' : 'warning' }} text-{{ 'Active' == 'Active' ? 'success' : 'warning' }} rounded-pill px-3 py-1">
-                                            <i
-                                                class="fas fa-{{ 'Active' == 'Active' ? 'check-circle' : 'clock' }} me-1"></i>
-                                            {{ 'success' }}
-                                        </span>
-                                    </td>
-                                    <td class="pe-4 py-3 text-end">
-                                        <div class="d-flex justify-content-end">
-                                            <a href="{{ route('invoices.show', $prescription->id) }}">
-                                                <button
-                                                    class="btn btn-sm btn-outline-primary rounded-pill me-2 px-3 action-btn">
-                                                    <i class="fas fa-eye me-1"></i> View
-                                                </button>
-                                            </a>
+                                        <div>
+                                            <div class="fw-semibold">{{ $prescription->doctor->user->name }}</div>
+                                            <small class="text-muted">Main Hospital</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3">
+                                    <span
+                                        class="fw-medium">{{ \Carbon\Carbon::parse($prescription->date)->format('M d, Y') }}</span><br>
+                                    <small
+                                        class="text-muted">{{ \Carbon\Carbon::parse($prescription->date)->format('h:i A') }}</small>
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">
+                                        <i class="fas fa-pills me-1"></i> {{ $prescription->medications }} Meds
+                                    </span>
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">
+                                        <i class="fas fa-check-circle me-1"></i> Active
+                                    </span>
+                                </td>
+                                <td class="pe-4 py-3 text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="javascript:void(0);"
+                                            class="btn btn-sm btn-outline-primary rounded-pill px-3 view-invoice-btn"
+                                            data-url="{{ route('invoices.show', $prescription->id) }}">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
 
-                                            <a href="{{ route('generate.invoice', $prescription->id) }}"
-                                                class="btn btn-sm btn-outline-success rounded-pill px-3 action-btn"
-                                                target="_blank">
-                                                <i class="fas fa-download me-1"></i> PDF
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                        <a href="javascript:void(0);"
+                                            class="btn btn-sm btn-outline-success rounded-pill px-3 download-invoice-btn"
+                                            data-url="{{ route('generate.invoice', $prescription->id) }}">
+                                            <i class="fas fa-download me-1"></i> PDF
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">No prescriptions found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
-            <div class="card-footer bg-white border-0 py-3 px-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-muted small">
-                        Showing <span class="fw-semibold">{{ count($prescriptions) }}</span> of <span
-                            class="fw-semibold">{{ $prescriptions->count() }}</span> prescriptions
-                    </div>
-                    <!-- pagination  -->
+            <div class="card-footer bg-white border-top-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                    Showing <span class="fw-semibold">{{ $prescriptions->count() }}</span> of {{ $prescriptions->total() }}
+                    prescriptions
+                </div>
+                <div>
+                    {{ $prescriptions->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>
+
+        <!-- Invoice Modal -->
+        <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content rounded-4 shadow">
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="invoiceModalLabel">Invoice Preview</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="invoiceModalBody">
+                        <div class="text-center text-muted">Loading invoice...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <script>
+        document.querySelectorAll('.view-invoice-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const url = btn.dataset.url;
+                const modalBody = document.getElementById('invoiceModalBody');
+                const modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+
+                // Show loading state
+                modalBody.innerHTML =
+                    '<div class="text-center text-muted py-5"><i class="fas fa-spinner fa-spin me-2"></i>Loading invoice...</div>';
+                modal.show();
+
+                try {
+                    const response = await fetch(url);
+                    const html = await response.text();
+                    modalBody.innerHTML = html;
+                } catch (error) {
+                    modalBody.innerHTML =
+                        '<div class="text-danger text-center py-4">Failed to load invoice. Please try again later.</div>';
+                }
+            });
+        });
+
+        document.querySelectorAll('.download-invoice-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const url = button.dataset.url;
+
+                Swal.fire({
+                    title: 'Generating PDF...',
+                    text: 'Please wait while we prepare your invoice.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    showConfirmButton: false
+                });
+
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.click();
+
+                    Swal.close();
+                }, 2000);
+            });
+        });
+    </script>
+
 @endsection

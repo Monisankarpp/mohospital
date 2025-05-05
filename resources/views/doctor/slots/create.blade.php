@@ -118,6 +118,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Make sure the day toggle works on initial load
             document.querySelectorAll('.day-toggle').forEach(function(toggle) {
                 toggle.addEventListener('change', function() {
                     const dayFields = this.closest('.card').querySelector('.day-fields');
@@ -127,7 +128,16 @@
                         dayFields.classList.add('d-none');
                     }
                 });
+
+                // Trigger the event on page load to handle the initial state
+                const dayFields = toggle.closest('.card').querySelector('.day-fields');
+                if (toggle.checked) {
+                    dayFields.classList.remove('d-none');
+                } else {
+                    dayFields.classList.add('d-none');
+                }
             });
         });
     </script>
+
 @endsection

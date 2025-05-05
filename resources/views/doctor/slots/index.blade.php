@@ -90,13 +90,20 @@
                                         @endif
                                     </td>
                                     <td class="pe-4 py-3 text-end">
-                                        <div class="form-check form-switch d-inline-flex align-items-center gap-2">
-                                            <input class="form-check-input styled-toggle day-toggle" type="checkbox"
-                                                id="dayToggle-{{ $day }}"
-                                                name="days[{{ $day }}][is_working]" value="1"
-                                                {{ $schedule->is_working ? 'checked' : '' }}>
-                                        </div>
+                                        <div class="d-flex justify-content-end align-items-center gap-2">
+                                            <form action="{{ route('doctor.slots.unavailable-day') }}" method="POST"
+                                                class="mark-unavailable-form" data-day="{{ $day }}">
+                                                @csrf
+                                                <input type="hidden" name="day" value="{{ $day }}">
+                                                <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger rounded-pill mark-unavailable-btn"
+                                                    data-day="{{ $day }}"
+                                                    {{ !$schedule || !$schedule->is_working ? 'disabled' : '' }}>
+                                                    <i class="fas fa-ban me-1"></i> Mark Unavailable
+                                                </button>
 
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -145,6 +152,7 @@
                                 <i class="fas fa-calendar-day me-2 text-info"></i>
                                 {{ \Carbon\Carbon::parse($date)->format('l, F j, Y') }}
                             </h5>
+
 
                             <div class="row g-4">
                                 @foreach ($dateSlots as $slot)
@@ -239,4 +247,68 @@
         </div>
 
     </div>
+
+    <script>
+        document.querySelectorAll('.mark-unavailable-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const day = this.dataset.day;
+                Swal.fire({
+                    title: `Mark ${day.charAt(0).toUpperCase() + day.slice(1)} as Unavailable?`,
+                    text: "All slots will be deleted and patients notified.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, mark unavailable!',
+                    cancelButtonText: 'Cancel',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.submit();
+                    }
+                });
+            });
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const forms = document.querySelectorAll('.mark-unavailable-form');
+
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const day = this.dataset.day;
+                    const row = this.closest('tr');
+
+                    // Disable the button
+                    const button = this.querySelector('button');
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-check-circle me-1"></i> Unavailable';
+
+                    // Change status badge to "Off"
+                    const statusCell = row.children[1];
+                    statusCell.innerHTML = `
+                <span class="badge rounded-pill py-2 px-3 bg-secondary-subtle text-secondary">
+                    Off
+                </span>
+            `;
+
+                    // Replace time cells with "-"
+                    for (let i = 2; i <= 4; i++) {
+                        row.children[i].innerHTML = `<span class="text-muted">-</span>`;
+                    }
+
+                    // Send the form via fetch (optional: remove if you're OK with default form POST)
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': this.querySelector('input[name="_token"]')
+                                .value,
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams(new FormData(this))
+                    });
+                });
+            });
+        });
+    </script>
 @endsection

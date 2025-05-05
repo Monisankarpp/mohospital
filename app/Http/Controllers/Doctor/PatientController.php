@@ -17,9 +17,8 @@ class PatientController extends Controller
                 $query->where('doctor_id', $doctorId);
             })
             ->orderByDesc('created_at')
-            ->get()
-            ->unique('patient_id')
-            ->values(); // reset keys
+            ->distinct('patient_id')
+            ->paginate(8);
 
         return view('doctor.patient', compact('recentPatients'));
     }

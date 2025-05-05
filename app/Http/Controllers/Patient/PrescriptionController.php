@@ -11,7 +11,7 @@ class PrescriptionController extends Controller
   public function index()
   {
     $prescriptions = Prescription::with(['doctor.user'])
-      ->where('patient_id', auth()->id())->orderByDesc('created_at')->get();
+      ->where('patient_id', auth()->id())->orderByDesc('created_at')->paginate(6);
 
     return view('patient.prescriptions', compact('prescriptions'));
   }

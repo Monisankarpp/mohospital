@@ -28,7 +28,7 @@ class RegisterController extends Controller
         Auth::login($user);
 
         return redirect()->route(match ($user->role) {
-            'doctor' => 'doctor.dashboard',
+            'doctor' => 'doctor.profile',
             'medical_store_owner' => 'medical-store.dashboard',
             default => 'patient.dashboard',
         });

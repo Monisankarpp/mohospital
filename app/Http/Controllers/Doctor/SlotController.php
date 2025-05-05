@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Doctor;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSlotRequest;
 use App\Http\Requests\UpdateSlotRequest;
+use App\Jobs\SendRescheduleEmailToPatient;
 use App\Models\DoctorSchedule;
 use App\Models\Slot;
 use App\Services\SlotGeneratorService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use App\Models\Appointment;
 
 class SlotController extends Controller
 {
@@ -179,4 +180,52 @@ class SlotController extends Controller
 
 		return redirect()->route('doctor.slots.index')->with('success', 'Default schedule applied successfully');
 	}
+
+	public function markUnavailableDay(Request $request)
+	{
+		$request->validate([
+			'day' => 'required|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+		]);
+
+		$doctor = auth()->user()->doctor;
+		$day = strtolower($request->day);
+		$dayNumber = Carbon::createFromFormat('l', ucfirst($day))->dayOfWeek;
+
+		$schedule = DoctorSchedule::where('doctor_id', $doctor->id)
+			->where('day_of_week', $day)
+			->first();
+
+		if ($schedule) {
+			$schedule->is_working = false;
+			$schedule->save();
+		}
+
+		$slotsToDelete = Slot::where('doctor_id', $doctor->id)
+			->where('start_time', '>=', now())
+			->whereRaw('WEEKDAY(start_time) = ?', [$dayNumber === 0 ? 6 : $dayNumber - 1])
+			->get();
+
+		$notifiedCount = 0;
+
+		foreach ($slotsToDelete as $slot) {
+			$appointments = Appointment::with(['patient', 'slot.doctor.user'])
+				->where('slot_id', $slot->id)
+				->get();
+
+			foreach ($appointments as $appointment) {
+				if ($appointment->patient && $appointment->patient->email) {
+					SendRescheduleEmailToPatient::dispatch($appointment);
+					$notifiedCount++;
+				}
+			}
+
+			$slot->delete();
+		}
+
+
+		return back()->with('success', "All $day slots deleted. all patient's are notified.");
+
+	}
+
+
 }

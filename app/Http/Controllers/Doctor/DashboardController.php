@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Appointment;
 use App\Models\Slot;
+use App\Mail\PrescriptionWithThankYou;
+use Illuminate\Support\Facades\Mail;
 
 class DashboardController extends Controller
 {
@@ -56,4 +58,16 @@ class DashboardController extends Controller
     return view('doctor.dashboard', compact('appointmentsToday', 'recentPatients', 'totalPatientsCount', 'upcomingAppointmentsCount', 'totalAvailableSlots'));
 
   }
+
+  public function complete(Request $request, Appointment $appointment)
+  {
+    $appointment->update(['status' => 'completed']);
+
+    $appointment->load(['patient', 'slot.doctor.user']);
+
+    Mail::to($appointment->patient->email)->send(new PrescriptionWithThankYou($appointment));
+
+    return response()->json(['success' => true]);
+  }
+
 }

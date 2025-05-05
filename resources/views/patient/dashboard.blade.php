@@ -107,7 +107,7 @@
                             </div>
                             <div>
                                 <h6 class="mb-0 text-muted" style="font-size: 0.85rem;">Recent Messages</h6>
-                                <h3 class="mb-0" style="color: #2c3e50; font-weight: 700;">0</h3>
+                                <h3 class="mb-0" style="color: #2c3e50; font-weight: 700;">{{ $messageCount }}</h3>
                             </div>
                         </div>
                     </div>
@@ -135,7 +135,7 @@
                         Your scheduled consultations with healthcare providers
                     </p>
                 </div>
-                <a href="{{ route('patient.appointments.book') }}" class="btn btn-sm rounded-pill px-3"
+                <a href="/" class="btn btn-sm rounded-pill px-3"
                     style="
                     background: rgba(52, 152, 219, 0.1);
                     backdrop-filter: blur(5px);
@@ -203,7 +203,8 @@
                                     <td class="py-3">
                                         <div>
                                             <div style="font-weight: 500;">
-                                                {{ \Carbon\Carbon::parse($appointment->date)->format('d M, Y') }}</div>
+                                                {{ \Carbon\Carbon::parse($appointment->slot->date)->format('d M, Y') }}
+                                            </div>
                                             <small class="text-muted" style="font-size: 0.85rem;">
                                                 {{ \Carbon\Carbon::parse($appointment->slot->start_time)->format('h:i A') }}
                                                 -
@@ -214,10 +215,14 @@
                                     <td class="py-3">
                                         @php
                                             $statusColors = [
-                                                'accepted' => ['#27ae60', 'rgba(39, 174, 96, 0.1)', 'fa-check-circle'],
+                                                'completed' => ['#27ae60', 'rgba(39, 174, 96, 0.1)', 'fa-check-circle'],
                                                 'pending' => ['#f39c12', 'rgba(243, 156, 18, 0.1)', 'fa-clock'],
-                                                'rejected' => ['#e74c3c', 'rgba(231, 76, 60, 0.1)', 'fa-times-circle'],
-                                                'rescheduled' => ['#3498db', 'rgba(52, 152, 219, 0.1)', 'fa-sync-alt'],
+                                                'rescheduled' => [
+                                                    '#e74c3c',
+                                                    'rgba(231, 76, 60, 0.1)',
+                                                    'fa-times-circle',
+                                                ],
+                                                'accepted' => ['#3498db', 'rgba(52, 152, 219, 0.1)', 'fa-sync-alt'],
                                             ];
 
                                             $status = strtolower($appointment->status);
@@ -237,29 +242,22 @@
                                         </span>
                                     </td>
                                     <td class="pe-4 py-3 text-end">
-                                        <div class="d-flex justify-content-end">
-                                            <!-- View Button -->
-                                            <button class="btn btn-sm rounded-pill px-3 me-2" data-bs-toggle="modal"
-                                                data-bs-target="#viewModal{{ $appointment->id }}"
-                                                style="background: rgba(108, 117, 125, 0.1); backdrop-filter: blur(5px); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.1);">
-                                                <i class="fas fa-eye fa-xs"></i>
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <!-- View Icon Button -->
+                                            <button type="button"
+                                                class="btn btn-sm d-flex align-items-center justify-content-center rounded-pill shadow-sm"
+                                                onclick="viewAppointment({{ $appointment->id }})"
+                                                style="width: 36px; height: 36px; background: rgba(108, 117, 125, 0.1); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.2); transition: 0.2s;">
+                                                <i class="fas fa-eye fa-sm"></i>
                                             </button>
 
-                                            <!-- Edit Button -->
-                                            @php
-                                                $canEdit = \Carbon\Carbon::now()
-                                                    ->addHours(24)
-                                                    ->lt(
-                                                        \Carbon\Carbon::parse(
-                                                            $appointment->date . ' ' . $appointment->slot->start_time,
-                                                        ),
-                                                    );
-                                            @endphp
-                                            @if ($canEdit)
-                                                <button class="btn btn-sm rounded-pill px-3" data-bs-toggle="modal"
-                                                    data-bs-target="#editModal{{ $appointment->id }}"
-                                                    style="background: rgba(52, 152, 219, 0.1); backdrop-filter: blur(5px); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.1);">
-                                                    <i class="fas fa-edit fa-xs"></i>
+                                            <!-- Reschedule Icon Button -->
+                                            @if ($appointment->status != 'completed' && \Carbon\Carbon::parse($appointment->slot->start_time)->isFuture())
+                                                <button type="button"
+                                                    class="btn btn-sm d-flex align-items-center justify-content-center rounded-pill shadow-sm reschedule-btn"
+                                                    data-id="{{ $appointment->id }}"
+                                                    style="width: 36px; height: 36px; background: rgba(52, 152, 219, 0.1); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.2); transition: 0.2s;">
+                                                    <i class="fas fa-calendar-alt fa-sm"></i>
                                                 </button>
                                             @endif
                                         </div>
@@ -275,8 +273,7 @@
                                     ">
                                         <i class="fas fa-calendar-times fa-2x mb-3" style="color: #bdc3c7;"></i>
                                         <p class="mb-0 text-muted">No upcoming appointments scheduled</p>
-                                        <a href="{{ route('patient.appointments.book') }}"
-                                            class="btn btn-sm mt-2 rounded-pill"
+                                        <a href="/" class="btn btn-sm mt-2 rounded-pill"
                                             style="
                                             background: rgba(52, 152, 219, 0.1);
                                             backdrop-filter: blur(5px);
@@ -290,211 +287,6 @@
                             @endforelse
                         </tbody>
                     </table>
-                    @foreach ($appointments as $appointment)
-                        <!-- View Modal -->
-                        <div class="modal fade" id="viewModal{{ $appointment->id }}" tabindex="-1"
-                            aria-labelledby="viewModalLabel{{ $appointment->id }}" aria-hidden="true"
-                            style="z-index: 1060;">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden;">
-                                    <div class="modal-header position-relative"
-                                        style="background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); color: white; border-bottom: none;">
-                                        <div class="w-100 text-center">
-                                            <div class="rounded-circle bg-white p-3 d-inline-flex align-items-center justify-content-center mb-3"
-                                                style="width: 60px; height: 60px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                                <i class="fas fa-calendar-check text-primary"
-                                                    style="font-size: 1.5rem;"></i>
-                                            </div>
-                                            <h5 class="modal-title w-100" id="viewModalLabel{{ $appointment->id }}"
-                                                style="font-weight: 600;">Appointment Details</h5>
-                                        </div>
-                                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3"
-                                            data-bs-dismiss="modal" aria-label="Close"
-                                            style="filter: invert(1);"></button>
-                                    </div>
-                                    <div class="modal-body p-4">
-                                        <div class="d-flex align-items-start mb-4">
-                                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
-                                                <i class="fas fa-user-md text-primary"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-1" style="font-weight: 600;">Dr.
-                                                    {{ $appointment->slot->doctor->user->name }}</h6>
-                                                <p class="mb-0 text-muted">
-                                                    {{ $appointment->slot->doctor->specialization }}</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <div class="p-3 bg-light rounded"
-                                                    style="background-color: #f8f9fa !important;">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="bg-info bg-opacity-10 p-2 rounded-circle me-3">
-                                                            <i class="fas fa-calendar-day text-info"></i>
-                                                        </div>
-                                                        <div>
-                                                            <small class="text-muted">Date</small>
-                                                            <p class="mb-0" style="font-weight: 500;">
-                                                                {{ \Carbon\Carbon::parse($appointment->date)->format('d M Y') }}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="p-3 bg-light rounded"
-                                                    style="background-color: #f8f9fa !important;">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3">
-                                                            <i class="fas fa-clock text-success"></i>
-                                                        </div>
-                                                        <div>
-                                                            <small class="text-muted">Time</small>
-                                                            <p class="mb-0" style="font-weight: 500;">
-                                                                {{ \Carbon\Carbon::parse($appointment->slot->start_time)->format('h:i A') }}
-                                                                -
-                                                                {{ \Carbon\Carbon::parse($appointment->slot->end_time)->format('h:i A') }}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-4">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <small class="text-muted">Appointment Status</small>
-                                                @php
-                                                    $statusColors = [
-                                                        'accepted' => ['success', 'fa-check-circle'],
-                                                        'pending' => ['warning', 'fa-clock'],
-                                                        'rejected' => ['danger', 'fa-times-circle'],
-                                                        'rescheduled' => ['info', 'fa-sync-alt'],
-                                                    ];
-                                                    $status = strtolower($appointment->status);
-                                                    $config = $statusColors[$status] ?? [
-                                                        'secondary',
-                                                        'fa-question-circle',
-                                                    ];
-                                                @endphp
-                                                <span
-                                                    class="badge bg-light text-{{ $config[0] }} border border-{{ $config[0] }} rounded-pill py-1 px-3">
-                                                    <i class="fas {{ $config[1] }} me-1"></i> {{ ucfirst($status) }}
-                                                </span>
-                                            </div>
-
-                                            @if ($appointment->notes)
-                                                <div class="mt-3">
-                                                    <small class="text-muted">Doctor's Notes</small>
-                                                    <div class="p-3 bg-light rounded mt-1"
-                                                        style="background-color: #f8f9fa !important; font-size: 0.9rem;">
-                                                        {{ $appointment->notes }}
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer border-top-0">
-                                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
-                                            data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary rounded-pill px-4">
-                                            <i class="fas fa-calendar-plus me-2"></i> Add to Calendar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Edit Modal (only if can edit) -->
-                        @php
-                            $canEdit = \Carbon\Carbon::now()
-                                ->addHours(24)
-                                ->lt(\Carbon\Carbon::parse($appointment->date . ' ' . $appointment->slot->start_time));
-                        @endphp
-                        @if ($canEdit)
-                            <div class="modal fade" id="editModal{{ $appointment->id }}" tabindex="-1"
-                                aria-labelledby="editModalLabel{{ $appointment->id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content" style="border-radius: 16px; border: none;">
-                                        <div class="modal-header position-relative"
-                                            style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; border-bottom: none;">
-                                            <div class="w-100 text-center">
-                                                <div class="rounded-circle bg-white p-3 d-inline-flex align-items-center justify-content-center mb-3"
-                                                    style="width: 60px; height: 60px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                                                    <i class="fas fa-edit text-primary" style="font-size: 1.5rem;"></i>
-                                                </div>
-                                                <h5 class="modal-title w-100" id="editModalLabel{{ $appointment->id }}"
-                                                    style="font-weight: 600;">Reschedule Appointment</h5>
-                                            </div>
-                                            <button type="button" class="btn-close position-absolute top-0 end-0 m-3"
-                                                data-bs-dismiss="modal" aria-label="Close"
-                                                style="filter: invert(1);"></button>
-                                        </div>
-                                        <form action="{{ route('patient.appointments.update', $appointment->id) }}"
-                                            method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="modal-body p-4">
-                                                <div class="mb-4">
-                                                    <div class="d-flex align-items-start">
-                                                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
-                                                            <i class="fas fa-user-md text-primary"></i>
-                                                        </div>
-                                                        <div>
-                                                            <h6 class="mb-1" style="font-weight: 600;">Dr.
-                                                                {{ $appointment->slot->doctor->user->name }}</h6>
-                                                            <p class="mb-0 text-muted">
-                                                                {{ $appointment->slot->doctor->specialization }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Select New Date</label>
-                                                    <input type="date" name="date"
-                                                        class="form-control rounded-pill"
-                                                        value="{{ $appointment->date }}" required
-                                                        style="padding: 0.75rem 1rem; border-color: #e2e8f0;">
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Select Time Slot</label>
-                                                    <select name="slot_id" class="form-select rounded-pill" required
-                                                        style="padding: 0.75rem 1rem; border-color: #e2e8f0;">
-                                                        @foreach ($availableSlots as $slot)
-                                                            <option value="{{ $slot->id }}"
-                                                                {{ $appointment->slot_id == $slot->id ? 'selected' : '' }}>
-                                                                {{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }}
-                                                                -
-                                                                {{ \Carbon\Carbon::parse($slot->end_time)->format('h:i A') }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-
-                                                <div class="alert alert-warning mt-4" style="border-radius: 12px;">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fas fa-exclamation-triangle me-3"></i>
-                                                        <small>Please note that rescheduling within 24 hours of your
-                                                            appointment may be subject to cancellation fees.</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-top-0">
-                                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
-                                                    data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-primary rounded-pill px-4">
-                                                    <i class="fas fa-save me-2"></i> Save Changes
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    @endforeach
-
                 </div>
             </div>
 
@@ -675,4 +467,152 @@
         @endif
 
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const appointments = @json($appointments);
+
+        // Helper to format date
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Helper to format time
+        function formatTime(isoString) {
+            const time = new Date(isoString);
+            return time.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        // View Appointment
+        function viewAppointment(id) {
+            const appointment = appointments.find(app => app.id === id);
+            if (!appointment) {
+                Swal.fire('Error', 'Appointment not found.', 'error');
+                return;
+            }
+
+            const slot = appointment.slot || {};
+            const doctor = slot.doctor || {};
+            const user = doctor.user || {};
+
+            const doctorName = user.name || 'Unavailable';
+            const specialization = doctor.specialization || 'N/A';
+            const startTime = slot.start_time || '';
+            const endTime = slot.end_time || '';
+            const formattedDate = formatDate(startTime);
+            const formattedStart = formatTime(startTime);
+            const formattedEnd = formatTime(endTime);
+            const status = appointment.status ? appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1) :
+                'Unknown';
+
+            Swal.fire({
+                title: 'Appointment Details',
+                html: `
+            <div style="text-align: left;">
+                <p><strong>Doctor:</strong> Dr. ${doctorName}</p>
+                <p><strong>Specialization:</strong> ${specialization}</p>
+                <p><strong>Date:</strong> ${formattedDate}</p>
+                <p><strong>Time:</strong> ${formattedStart} - ${formattedEnd}</p>
+                <p><strong>Status:</strong> ${status}</p>
+            </div>
+        `,
+                confirmButtonText: 'Close',
+                width: 500
+            });
+        }
+
+        // Reschedule
+        document.querySelectorAll('.reschedule-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = `
+            <label class="mb-2">Select new date & time:</label>
+            <select id="availableSlots" class="form-control">
+                <option value="">Loading...</option>
+            </select>
+        `;
+
+                const {
+                    isConfirmed
+                } = await Swal.fire({
+                    title: 'Reschedule Appointment',
+                    html: wrapper,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'Reschedule',
+                    customClass: {
+                        confirmButton: 'btn btn-success rounded-pill px-4 me-2',
+                        cancelButton: 'btn btn-secondary rounded-pill px-4'
+                    },
+                    didOpen: async () => {
+                        // Fetch available slots for the doctor
+                        const response = await fetch(
+                            `/doctor/appointments/${btn.dataset.id}/available-slots`);
+                        const data = await response.json();
+
+                        if (data.success) {
+                            const slotsDropdown = document.getElementById('availableSlots');
+                            slotsDropdown.innerHTML = '';
+                            data.slots.forEach(slot => {
+                                const option = document.createElement('option');
+                                option.value = slot.id;
+                                option.textContent = `${slot.date} - ${slot.time}`;
+                                slotsDropdown.appendChild(option);
+                            });
+                        } else {
+                            Swal.fire('Error', 'Unable to fetch available slots', 'error');
+                        }
+                    },
+                    preConfirm: () => {
+                        const selectedSlot = document.getElementById('availableSlots')
+                            .value;
+                        if (!selectedSlot) {
+                            Swal.showValidationMessage('Please select a valid slot');
+                        }
+                        return selectedSlot;
+                    }
+                });
+
+                const selectedSlot = document.getElementById('availableSlots')?.value;
+
+                if (isConfirmed && selectedSlot) {
+                    try {
+                        const response = await fetch(
+                            `/doctor/appointments/${btn.dataset.id}/reschedule`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    slot_id: selectedSlot
+                                })
+                            });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            Swal.fire('Rescheduled!', 'Appointment updated successfully.', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', data.message || 'Something went wrong.', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Unable to communicate with the server.', 'error');
+                    }
+                }
+            });
+        });
+    </script>
+
+
 @endsection

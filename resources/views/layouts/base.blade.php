@@ -18,6 +18,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
 
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- Optional: Flatpickr Theme (e.g., Material Blue) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -47,6 +57,7 @@
 
     @yield('scripts')
 
+
     <!-- Page Transition Animation -->
     <script>
         barba.init({
@@ -59,6 +70,10 @@
                         duration: 0.4,
                         ease: 'power2.out'
                     });
+
+                    // Initialize Flatpickr after the initial page load
+                    initializeFlatpickr();
+                    initializeDayToggle();
                 },
                 async leave(data) {
                     await gsap.to(data.current.container.querySelector('.transition-content'), {
@@ -75,10 +90,49 @@
                         duration: 0.4,
                         ease: 'power2.out'
                     });
+
+                    // Initialize Flatpickr after the page transition
+                    initializeFlatpickr();
+                    initializeDayToggle();
                 }
             }]
         });
+
+        // Function to initialize Flatpickr on dynamically loaded content
+        function initializeFlatpickr() {
+            flatpickr(".datetime-picker", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                time_24hr: true,
+                minuteIncrement: 5,
+                allowInput: true
+            });
+
+            function initializeDayToggle() {
+                document.querySelectorAll('.day-toggle').forEach(function(toggle) {
+                    toggle.addEventListener('change', function() {
+                        const dayFields = this.closest('.card').querySelector('.day-fields');
+                        if (this.checked) {
+                            dayFields.classList.remove('d-none');
+                        } else {
+                            dayFields.classList.add('d-none');
+                        }
+                    });
+
+                    // Trigger the event on page load to handle the initial state
+                    const dayFields = toggle.closest('.card').querySelector('.day-fields');
+                    if (toggle.checked) {
+                        dayFields.classList.remove('d-none');
+                    } else {
+                        dayFields.classList.add('d-none');
+                    }
+                });
+
+            }
     </script>
+
+
+
 </body>
 
 </html>

@@ -121,7 +121,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>© 2023 MoHospital. All rights reserved.</p>
+            <p>© 2025 MoHospital. All rights reserved.</p>
             <p>123 Medical Center Drive, City, State 12345</p>
             <p>
                 <a href="#" style="color: #3182ce; text-decoration: none;">Privacy Policy</a> |

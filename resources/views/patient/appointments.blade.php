@@ -62,7 +62,8 @@
                                     <td class="py-3">
                                         <div>
                                             <div style="font-weight: 500;">
-                                                {{ \Carbon\Carbon::parse($appointment->date)->format('d M, Y') }}</div>
+                                                {{ \Carbon\Carbon::parse($appointment->slot->date)->format('d M, Y') }}
+                                            </div>
                                             <small class="text-muted" style="font-size: 0.85rem;">
                                                 {{ \Carbon\Carbon::parse($appointment->slot->start_time)->format('h:i A') }}
                                                 -
@@ -73,10 +74,14 @@
                                     <td class="py-3">
                                         @php
                                             $statusColors = [
-                                                'accepted' => ['#2ed573', 'rgba(46, 213, 115, 0.1)', 'fa-check-circle'],
-                                                'pending' => ['#ffa502', 'rgba(255, 165, 2, 0.1)', 'fa-clock'],
-                                                'rejected' => ['#ff4757', 'rgba(255, 71, 87, 0.1)', 'fa-times-circle'],
-                                                'rescheduled' => ['#1e90ff', 'rgba(30, 144, 255, 0.1)', 'fa-sync-alt'],
+                                                'completed' => ['#27ae60', 'rgba(39, 174, 96, 0.1)', 'fa-check-circle'],
+                                                'pending' => ['#f39c12', 'rgba(243, 156, 18, 0.1)', 'fa-clock'],
+                                                'rescheduled' => [
+                                                    '#e74c3c',
+                                                    'rgba(231, 76, 60, 0.1)',
+                                                    'fa-times-circle',
+                                                ],
+                                                'accepted' => ['#3498db', 'rgba(52, 152, 219, 0.1)', 'fa-sync-alt'],
                                             ];
 
                                             $status = strtolower($appointment->status); // just to be safe

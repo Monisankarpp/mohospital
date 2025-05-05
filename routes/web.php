@@ -107,6 +107,8 @@ Route::middleware(['role:doctor'])
         Route::post('/prescription-upload', [DoctorPrescriptionController::class, 'store'])->name('prescription.store');
 
         Route::get('/my-patients', [DoctorPatientController::class, 'index'])->name('my-patients');
+        Route::post('/slots/unavailable-day', [SlotController::class, 'markUnavailableDay'])->name('slots.unavailable-day');
+
 
 
     });
@@ -146,3 +148,20 @@ Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationContro
 
 Route::post('/api/chat', [ChatController::class, 'chat']);
 Route::view('/chat', 'chat');
+
+Route::post('/doctor/appointments/{appointment}/reschedule', [DoctorAppointmentController::class, 'reschedule']);
+
+
+// In your web.php
+Route::get('/doctor/appointments/{appointment}/available-slots', [DoctorAppointmentController::class, 'getAvailableSlots']);
+
+
+Route::post('/doctor/appointments/{appointment}/complete', [DoctorDashboardController::class, 'complete'])->name('doctor.appointments.complete');
+
+
+Route::post('/appointments/{id}/reschedule', [PatientDashboardController::class, 'reschedule']);
+Route::get('/doctors/{doctor}/available-slots', [PatientDashboardController::class, 'getAvailableSlots']);
+
+
+Route::get('/notifications/all', [NotificationController::class, 'all'])->name('notifications.all');
+Route::get('/notifications/{id}', [NotificationController::class, 'show'])->name('notifications.show');

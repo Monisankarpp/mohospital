@@ -52,6 +52,7 @@ class DoctorController extends Controller
     {
         $slots = $doctor->slots()
             ->where('start_time', '>=', now())
+            ->where('is_lunch_break', '!=', 1)
             ->orderBy('start_time')
             ->get()
             ->groupBy(function ($slot) {

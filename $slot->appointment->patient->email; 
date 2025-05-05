@@ -1,0 +1,19 @@
+[90m= [39m[34;4mApp\Models\Slot[39;24m {#6318
+    [34mid[39m: [35m1025[39m,
+    [34mstart_time[39m: "[32m2025-05-05 16:20:00[39m",
+    [34mend_time[39m: "[32m2025-05-05 16:50:00[39m",
+    [34mcan_edit_until[39m: "[32m2025-05-04 16:20:00[39m",
+    [34mis_booked[39m: [35m0[39m,
+    [34mstatus[39m: "[32mavailable[39m",
+    [34mis_lunch_break[39m: [35m0[39m,
+    [34mcreated_at[39m: "[32m2025-05-04 07:46:23[39m",
+    [34mupdated_at[39m: "[32m2025-05-04 07:46:23[39m",
+    [34mdeleted_at[39m: [36mnull[39m,
+    [34mdoctor_id[39m: [35m2[39m,
+    [34mdate[39m: "[32m2025-05-05[39m",
+    [34mis_auto_generated[39m: [35m0[39m,
+    [34mis_recurring[39m: [35m0[39m,
+    [34mdoctor_schedule_id[39m: [36mnull[39m,
+    [34mappointment_id[39m: [36mnull[39m,
+  }
+

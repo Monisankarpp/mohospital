@@ -1,9 +1,3 @@
-{{-- @php
-    $doctor = auth()->user()->doctor;
-    $firstTime = $doctor && $doctor->schedules()->doesntExist();
-    // dd($firstTime);
-    $slotRoute = !$firstTime ? route('doctor.slots.first-time-setup') : route('doctor.slots.index');
-@endphp --}}
 <aside id="sidebar" class="d-none d-lg-block position-fixed h-100 shadow"
     style="top: 80px; width: 280px; z-index: 1030; background: linear-gradient(180deg, #2c3e50 0%, #1a1a2e 100%);">
 
