@@ -18,15 +18,26 @@ class AppointmentController extends Controller
   {
     $doctorUserId = Auth::id();
 
-    $appointments = Appointment::with(['patient', 'slot.doctor.user']) // eager load relationships
+    $appointments = Appointment::with(['patient', 'slot.doctor.user'])
+      ->where('status', '!=', 'completed')
       ->whereHas('slot.doctor', function ($query) use ($doctorUserId) {
         $query->where('user_id', $doctorUserId);
       })
       ->latest()
-      ->paginate(5);
+      ->paginate(5, ['*'], 'upcoming_page');
 
 
-    return view('doctor.appointments', compact('appointments'));
+    $completedAppointments = Appointment::with(['patient', 'slot.doctor.user'])
+      ->where('status', 'completed')
+      ->whereHas('slot.doctor', function ($query) use ($doctorUserId) {
+        $query->where('user_id', $doctorUserId);
+      })
+      ->latest()
+      ->paginate(5, ['*'], 'completed_page');
+
+
+
+    return view('doctor.appointments', compact('appointments', 'completedAppointments'));
   }
 
   public function getAvailableSlots($appointmentId)

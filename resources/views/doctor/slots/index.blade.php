@@ -50,9 +50,12 @@
                                 @endphp
                                 <tr class="border-top">
                                     <td class="ps-4 py-3 fw-semibold">
-                                        <span class="{{ $day === strtolower(now()->format('l')) ? 'text-primary' : '' }}">
+                                        <button type="button"
+                                            class="btn btn-link text-decoration-none fw-semibold view-day-slots {{ $day === strtolower(now()->format('l')) ? 'text-primary' : '' }}"
+                                            data-day="{{ $day }}">
                                             {{ ucfirst($day) }}
-                                        </span>
+                                        </button>
+
                                     </td>
                                     <td class="py-3">
                                         <span
@@ -297,7 +300,6 @@
                         row.children[i].innerHTML = `<span class="text-muted">-</span>`;
                     }
 
-                    // Send the form via fetch (optional: remove if you're OK with default form POST)
                     fetch(this.action, {
                         method: 'POST',
                         headers: {
@@ -309,6 +311,176 @@
                     });
                 });
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const slotsByDay = @json($slotsByDay);
+
+            document.querySelectorAll('.view-day-slots').forEach(button => {
+                button.addEventListener('click', function() {
+                    const day = this.dataset.day;
+                    const slots = slotsByDay[day] || [];
+
+
+
+                    if (slots.length === 0) {
+                        Swal.fire({
+                            title: 'No Slots',
+                            text: 'No slots found for ' + capitalize(day),
+                            icon: 'info',
+                            background: 'rgba(248, 249, 250, 0.95)',
+                            backdrop: 'rgba(0, 0, 0, 0.15)'
+                        });
+                        return;
+                    }
+
+                    // Build responsive slot cards (3 per row)
+                    const slotCards = slots.map(slot => {
+                        const start = new Date(slot.start_time).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        const end = new Date(slot.end_time).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+                        const isBooked = slot.appointment && slot.appointment.user;
+                        const isBreak = slot.status === 'break';
+
+                        return `
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-lg overflow-hidden bg-gradient bg-opacity-10 ${isBooked ? 'bg-danger bg-opacity-10' : isBreak ? 'bg-warning bg-opacity-10' : 'bg-success bg-opacity-10'}">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="card-title mb-0 text-dark fw-semibold">${start} - ${end}</h6>
+                                    <span class="badge rounded-pill ${isBooked ? 'bg-danger' : isBreak ? 'bg-warning' : 'bg-success'}">${isBooked ? 'Booked' : isBreak ? 'Break' : 'Available'}</span>
+                                </div>
+                                ${isBooked
+                                    ? `<button class="btn btn-sm btn-outline-primary w-100 view-patient-btn mt-2"
+                                                                                                                                                                                        data-name="${slot.appointment.user.name || 'N/A'}"
+                                                                                                                                                                                        data-email="${slot.appointment.user.email || 'N/A'}"
+                                                                                                                                                                                        data-phone="${slot.appointment.user.phone || 'N/A'}">
+                                                                                                                                                                                        <i class="bi bi-person-circle me-1"></i> View Patient
+                                                                                                                                                                                    </button>`
+                                    : isBreak
+                                    ? `<button class="btn btn-sm btn-warning w-100 mt-2" disabled>
+                                                                                                                                                                                        <i class="bi bi-pause me-1"></i> Break Taken
+                                                                                                                                                                                    </button>`
+                                    : `<button class="btn btn-sm btn-primary w-100 mt-2 take-break-btn"
+                                                                                                                                                                                data-slot-id="${slot.id}">
+                                                                                                                                                                                    <i class="bi bi-pause me-1"></i> Let's Take a Break
+                                                                                                                                                                                </button>`
+                                }
+                            </div>
+                        </div>
+                    </div>`;
+                    }).join('');
+
+                    // Wrap in Bootstrap row
+                    const htmlContent = `<div class="row g-3">${slotCards}</div>`;
+
+                    Swal.fire({
+                        title: `<span class="text-dark">Slots for ${capitalize(day)}</span>`,
+                        html: htmlContent,
+                        width: 900,
+                        showConfirmButton: false,
+                        showCloseButton: true,
+                        background: 'rgba(248, 249, 250, 0.98)',
+                        backdrop: 'rgba(0, 0, 0, 0.1)',
+                        didRender: () => {
+                            // Use event delegation for dynamic buttons
+                            document.querySelectorAll('.view-patient-btn').forEach(
+                                btn => {
+                                    btn.addEventListener('click', function() {
+                                        Swal.fire({
+                                            title: '<span class="text-dark">Patient Details</span>',
+                                            html: `
+                                    <div class="text-start">
+                                        <div class="mb-3">
+                                            <h6 class="text-muted mb-1">Name</h6>
+                                            <p class="text-dark fw-semibold mb-0">${this.dataset.name}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <h6 class="text-muted mb-1">Email</h6>
+                                            <p class="text-dark fw-semibold mb-0">${this.dataset.email}</p>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-muted mb-1">Phone</h6>
+                                            <p class="text-dark fw-semibold mb-0">${this.dataset.phone}</p>
+                                        </div>
+                                    </div>`,
+                                            icon: 'info',
+                                            background: 'rgba(248, 249, 250, 0.98)',
+                                            confirmButtonColor: '#0d6efd',
+                                            backdrop: 'rgba(0, 0, 0, 0.1)'
+                                        });
+                                    });
+                                });
+
+                            // Handle Take Break button click
+                            document.querySelectorAll('.take-break-btn').forEach(
+                                btn => {
+                                    btn.addEventListener('click', function() {
+                                        const slotId = this.dataset.slotId;
+                                        console.log('slotsByDay:',
+                                            slotId);
+
+
+                                        markSlotAsBreak(slotId);
+
+                                        this.innerHTML =
+                                            `<i class="bi bi-pause me-1"></i> Break Taken`;
+                                        this.disabled =
+                                            true;
+                                        this.classList.remove(
+                                            'btn-primary');
+                                        this.classList.add('btn-warning');
+
+                                        const cardBody = this.closest(
+                                            '.card-body');
+                                        const badge = cardBody
+                                            .querySelector('.badge');
+
+                                        if (badge && badge.textContent
+                                            .trim() === 'Available') {
+                                            badge.textContent = 'Break';
+                                            badge.classList.remove(
+                                                'bg-success');
+                                            badge.classList.add(
+                                                'bg-warning');
+                                        }
+                                    });
+                                });
+                        }
+                    });
+                });
+            });
+
+            function capitalize(str) {
+                return str.charAt(0).toUpperCase() + str.slice(1);
+            }
+
+            function markSlotAsBreak(slotId) {
+                fetch(`/doctor/update-slot/${slotId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content')
+                    },
+                    body: JSON.stringify({
+                        status: 'break'
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        console.log(`Slot ${slotId} marked as break`);
+                    } else {
+                        console.error('Failed to update slot status');
+                    }
+                });
+            }
         });
     </script>
 @endsection

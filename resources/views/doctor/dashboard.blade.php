@@ -150,7 +150,7 @@
                                     <td class="pe-4 py-3 text-end">
                                         <button
                                             class="btn btn-sm btn-outline-primary rounded-pill px-3 hover-scale btn-start-appointment"
-                                            data-id="{{ $appointment->id }}">
+                                            data-id="{{ $appointment->id }}" data-status="{{ $appointment->status }}">
                                             <i class="fas fa-play me-1"></i> Start
                                         </button>
 
@@ -253,7 +253,21 @@
         document.querySelectorAll('.btn-start-appointment').forEach(button => {
             button.addEventListener('click', function() {
                 const appointmentId = this.dataset.id;
+                const appointmentStatus = this.dataset.status;
 
+                if (appointmentStatus === 'completed') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Already Completed',
+                        text: 'This appointment has already been marked as completed.',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'btn btn-secondary rounded-pill px-4'
+                        },
+                        buttonsStyling: false
+                    });
+                    return;
+                }
 
                 Swal.fire({
                     title: 'Complete Appointment?',
@@ -273,15 +287,12 @@
                                 body: JSON.stringify({})
                             })
                             .then(res => {
-                                if (!res.ok) {
-                                    throw new Error(res.statusText);
-                                }
+                                if (!res.ok) throw new Error(res.statusText);
                                 return res.json();
                             })
                             .then(data => {
-                                if (!data.success) {
-                                    throw new Error(data.message || 'Completion failed');
-                                }
+                                if (!data.success) throw new Error(data.message ||
+                                    'Completion failed');
                                 return data;
                             })
                             .catch(error => {
@@ -291,7 +302,6 @@
                     allowOutsideClick: () => !Swal.isLoading()
                 }).then(result => {
                     if (result.isConfirmed) {
-                        // Delay for animation effect
                         setTimeout(() => {
                             Swal.fire({
                                 icon: 'success',
@@ -304,14 +314,12 @@
                                     popup: 'animate__animated animate__fadeOutUp'
                                 }
                             }).then(() => location.reload());
-                        }, 300); // slight delay for smoother experience
+                        }, 300);
                     }
                 });
-
-
-
             });
         });
     </script>
+
 
 @endsection

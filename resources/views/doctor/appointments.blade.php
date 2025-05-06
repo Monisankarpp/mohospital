@@ -127,7 +127,7 @@
                         <strong>{{ $appointments->total() }}</strong> appointments
                     </div>
                     <div>
-                        {{ $appointments->links('pagination::bootstrap-5') }}
+                        {{ $appointments->appends(request()->except('upcoming_page'))->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             </div>
@@ -141,6 +141,93 @@
                 <p class="text-muted mb-4">You don't have any upcoming appointments scheduled.</p>
             </div>
         @endif
+
+
+        @if ($completedAppointments->count())
+            <div class="card border-0 shadow-sm rounded-4 mt-5">
+                <div class="card-header bg-white border-0 py-3 px-4">
+                    <h5 class="mb-0 fw-semibold text-dark">
+                        <i class="fas fa-check-circle me-2 text-success"></i> Completed Appointments
+                    </h5>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small text-uppercase">
+                            <tr class="fw-semibold">
+                                <th class="ps-4 py-3">Patient</th>
+                                <th class="py-3">Date & Time</th>
+                                <th class="py-3">Type</th>
+                                <th class="pe-4 py-3 text-end">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($completedAppointments as $appointment)
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                style="width: 42px; height: 42px; background-color: #e8f5e9; color: #2e7d32;">
+                                                {{ substr($appointment->patient->name, 0, 1) }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold text-dark">{{ $appointment->patient->name }}</div>
+                                                <small class="text-muted">{{ $appointment->patient->email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="fw-medium text-dark">
+                                            {{ \Carbon\Carbon::parse($appointment->slot->start_time)->format('M j, Y') }}
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ \Carbon\Carbon::parse($appointment->slot->start_time)->format('h:i A') }}
+                                        </small>
+                                    </td>
+                                    <td class="py-3 text-capitalize">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">
+                                            {{ $appointment->type ?? 'General' }}
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <button class="btn btn-sm btn-outline-success rounded-pill view-details"
+                                            data-patient="{{ $appointment->patient->name }}"
+                                            data-email="{{ $appointment->patient->email }}"
+                                            data-date="{{ $appointment->slot->start_time }}"
+                                            data-status="{{ $appointment->status }}"
+                                            data-type="{{ $appointment->type ?? 'General' }}">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="card-footer bg-white border-top-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        Showing <strong>{{ $completedAppointments->firstItem() }}</strong> to
+                        <strong>{{ $completedAppointments->lastItem() }}</strong> of
+                        <strong>{{ $completedAppointments->total() }}</strong> completed
+                    </div>
+                    <div>
+                        {{ $completedAppointments->appends(request()->except('completed_page'))->links('pagination::bootstrap-5') }}
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="card border-0 shadow-sm rounded-4 text-center py-5 mt-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle fa-3x text-muted"></i>
+                </div>
+                <h5 class="fw-semibold text-dark mb-2">No Completed Appointments</h5>
+                <p class="text-muted mb-0">You haven't completed any appointments yet.</p>
+            </div>
+        @endif
+
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

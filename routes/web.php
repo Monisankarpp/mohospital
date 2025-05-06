@@ -108,6 +108,8 @@ Route::middleware(['role:doctor'])
 
         Route::get('/my-patients', [DoctorPatientController::class, 'index'])->name('my-patients');
         Route::post('/slots/unavailable-day', [SlotController::class, 'markUnavailableDay'])->name('slots.unavailable-day');
+        Route::post('/update-slot/{slotId}', [SlotController::class, 'updateSlotStatus'])->name('update-slot');
+
 
 
 

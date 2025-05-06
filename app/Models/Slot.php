@@ -35,8 +35,9 @@ class Slot extends Model
 
     public function appointment()
     {
-        return $this->belongsTo(Appointment::class);
+        return $this->hasOne(Appointment::class, 'slot_id');
     }
+
     public function schedule()
     {
         return $this->belongsTo(DoctorSchedule::class, 'doctor_schedule_id');

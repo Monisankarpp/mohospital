@@ -61,13 +61,25 @@ class DashboardController extends Controller
 
   public function complete(Request $request, Appointment $appointment)
   {
-    $appointment->update(['status' => 'completed']);
+    if ($appointment->status === 'completed') {
+      return response()->json([
+        'success' => false,
+        'message' => 'Appointment is already completed.'
+      ], 400);
+    }
+
+    // Update status
+    $appointment->status = 'completed';
+    $appointment->save();
 
     $appointment->load(['patient', 'slot.doctor.user']);
 
     Mail::to($appointment->patient->email)->send(new PrescriptionWithThankYou($appointment));
 
-    return response()->json(['success' => true]);
+    return response()->json([
+      'success' => true,
+      'message' => 'Appointment completed and email sent.'
+    ]);
   }
 
 }

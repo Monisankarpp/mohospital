@@ -36,7 +36,42 @@ class SlotController extends Controller
 			->get()
 			->groupBy('date');
 
-		return view('doctor.slots.index', compact('schedules', 'slots'));
+
+
+		$slotsByDay = Slot::with(['appointment.patient'])
+			->whereNull('deleted_at')
+			->where('doctor_id', auth()->user()->doctor->id)
+			->where('date', '>=', now()->format('Y-m-d'))
+			->orderBy('date')
+			->orderBy('start_time')
+			->get()
+			->groupBy(function ($slot) {
+				return strtolower(Carbon::parse($slot->date)->format('l'));
+			})
+			->map(function ($slots) {
+				return $slots->map(function ($slot) {
+					return [
+						'id' => $slot->id,
+						'status' => $slot->status,
+						'start_time' => $slot->start_time->toDateTimeString(),
+						'end_time' => $slot->end_time->toDateTimeString(),
+						'appointment' => $slot->appointment ? [
+							'user' => [
+								'name' => $slot->appointment->patient->name ?? '',
+								'email' => $slot->appointment->patient->email ?? '',
+								'phone' => $slot->appointment->patient->phone ?? '',
+							]
+						] : null
+					];
+				});
+			});
+
+
+
+
+
+
+		return view('doctor.slots.index', compact('schedules', 'slots', 'slotsByDay'));
 	}
 
 	public function create()
@@ -227,5 +262,13 @@ class SlotController extends Controller
 
 	}
 
+	public function updateSlotStatus(Request $request, $slotId)
+	{
+		$slot = Slot::findOrFail($slotId);
+		$slot->status = 'break';
+		$slot->save();
+
+		return response()->json(['success' => true]);
+	}
 
 }
