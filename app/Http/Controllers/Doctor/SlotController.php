@@ -13,6 +13,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\Appointment;
+use App\Mail\RescheduleSlotNotification;
+use Illuminate\Support\Facades\Mail;
+use App\Models\Notification;
 
 class SlotController extends Controller
 {
@@ -158,17 +161,35 @@ class SlotController extends Controller
 
 		// Proceed with update
 		$data = $request->validated();
-		$start = Carbon::parse($data['start_time']);
+		$newStart = Carbon::parse($data['start_time']);
+		$newEnd = Carbon::parse($data['end_time']);
+
+		// Check for overlapping slots 
+		$overlap = Slot::where('doctor_id', $slot->doctor_id)
+			->where('id', '!=', $slot->id)
+			->where(function ($query) use ($newStart, $newEnd) {
+				$query->whereBetween('start_time', [$newStart, $newEnd])
+					->orWhereBetween('end_time', [$newStart, $newEnd])
+					->orWhere(function ($q) use ($newStart, $newEnd) {
+						$q->where('start_time', '<', $newStart)
+							->where('end_time', '>', $newEnd);
+					});
+			})
+			->exists();
+
+		if ($overlap) {
+			return redirect()->back()->with('error', 'The selected time range overlaps with another slot.');
+		}
 
 		$slot->update([
-			'start_time' => $start,
-			'end_time' => Carbon::parse($data['end_time']),
-			'can_edit_until' => $start->copy()->subDay()
+			'start_time' => $newStart,
+			'end_time' => $newEnd,
+			'can_edit_until' => $newStart->copy()->subDay(),
 		]);
 
-		return redirect()->route('doctor.slots.index')
-			->with('success', 'Slot updated successfully');
+		return redirect()->route('doctor.slots.index')->with('success', 'Slot updated successfully.');
 	}
+
 
 	public function destroy(Slot $slot)
 	{
@@ -176,6 +197,26 @@ class SlotController extends Controller
 		if (!$slot->isEditable()) {
 			return redirect()->back()->with('error', 'This slot can no longer be deleted');
 		}
+
+		if ($slot->status === 'booked' && $slot->appointment->user) {
+
+
+			Mail::to($slot->appointment->user->email)->send(new RescheduleSlotNotification($slot));
+
+			Notification::create([
+				'user_id' => $slot->appointment->user->id,
+				'title' => 'Slot Cancelled',
+				'message' => 'Your doctor has cancelled the appointment slot. Please reschedule.',
+				'is_read' => false,
+				'created_at' => now(),
+				'updated_at' => now(),
+			]);
+
+			$slot->delete();
+
+			return redirect()->route('doctor.slots.index')->with('success', 'Slot deleted successfully and email send to patient');
+		}
+
 
 		$slot->delete();
 

@@ -21,6 +21,7 @@ class DashboardController extends Controller
     $appointments = Appointment::with(['slot.doctor.user'])
       ->where('patient_id', Auth::id())
       ->where('status', '!=', 'completed')
+      ->whereNull('deleted_at')
       ->whereHas('slot', function ($query) {
         $query->where('start_time', '>=', Carbon::now());
       })
@@ -48,7 +49,7 @@ class DashboardController extends Controller
   public function getAvailableSlots(Doctor $doctor)
   {
     $slots = $doctor->slots()
-      ->whereDoesntHave('appointment') // exclude booked
+      ->whereDoesntHave('appointment')
       ->where('date', '>=', now()->toDateString())
       ->orderBy('start_time')
       ->get(['id', 'start_time', 'end_time']);
@@ -64,6 +65,7 @@ class DashboardController extends Controller
 
     $newSlot = Slot::where('id', $request->slot_id)
       ->where('doctor_id', $appointment->slot->doctor_id)
+      ->whereNull('deleted_at')
       ->whereDoesntHave('appointment')
       ->first();
 
