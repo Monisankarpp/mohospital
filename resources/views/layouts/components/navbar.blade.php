@@ -53,7 +53,7 @@
 
                     <!-- Notification items container with scroll -->
                     <div style="max-height: 400px; overflow-y: auto; background-color: #f8f9fa;">
-                        @forelse(auth()->user()->notifications()->latest()->take(2)->get() as $notification)
+                        @forelse(auth()->user()->notifications()->latest()->take(5)->get() as $notification)
                             <li class="border-bottom border-light">
                                 <a href="javascript:void(0);"
                                     class="dropdown-item d-flex py-3 px-3 position-relative notification-item"

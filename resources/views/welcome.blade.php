@@ -1192,7 +1192,6 @@
 
 
             // Handle "Pay Now" click
-
             let stripe = Stripe("{{ config('services.stripe.key') }}");
             let elements = stripe.elements();
             let cardElement = elements.create('card');
@@ -1201,6 +1200,16 @@
             document.getElementById('payNowBtn').addEventListener('click', function() {
                 // Fetch client secret from server
                 const appointmentId = document.getElementById('payNowBtn').dataset.appointmentId;
+
+                Swal.fire({
+                    title: 'Processing Payment',
+                    text: 'Please wait while we confirm your booking...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
                 fetch('/payment/create-intent', {
                         method: 'POST',

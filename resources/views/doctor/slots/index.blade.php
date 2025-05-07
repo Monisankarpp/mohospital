@@ -358,19 +358,19 @@
                                 </div>
                                 ${isBooked
                                     ? `<button class="btn btn-sm btn-outline-primary w-100 view-patient-btn mt-2"
-                                                                                                                                                                                        data-name="${slot.appointment.user.name || 'N/A'}"
-                                                                                                                                                                                        data-email="${slot.appointment.user.email || 'N/A'}"
-                                                                                                                                                                                        data-phone="${slot.appointment.user.phone || 'N/A'}">
-                                                                                                                                                                                        <i class="bi bi-person-circle me-1"></i> View Patient
-                                                                                                                                                                                    </button>`
+                                                                                                                                                                                            data-name="${slot.appointment.user.name || 'N/A'}"
+                                                                                                                                                                                            data-email="${slot.appointment.user.email || 'N/A'}"
+                                                                                                                                                                                            data-phone="${slot.appointment.user.phone || 'N/A'}">
+                                                                                                                                                                                            <i class="bi bi-person-circle me-1"></i> View Patient
+                                                                                                                                                                                        </button>`
                                     : isBreak
                                     ? `<button class="btn btn-sm btn-warning w-100 mt-2" disabled>
-                                                                                                                                                                                        <i class="bi bi-pause me-1"></i> Break Taken
-                                                                                                                                                                                    </button>`
+                                                                                                                                                                                            <i class="bi bi-pause me-1"></i> Break Taken
+                                                                                                                                                                                        </button>`
                                     : `<button class="btn btn-sm btn-primary w-100 mt-2 take-break-btn"
-                                                                                                                                                                                data-slot-id="${slot.id}">
-                                                                                                                                                                                    <i class="bi bi-pause me-1"></i> Let's Take a Break
-                                                                                                                                                                                </button>`
+                                                                                                                                                                                    data-slot-id="${slot.id}">
+                                                                                                                                                                                        <i class="bi bi-pause me-1"></i> Let's Take a Break
+                                                                                                                                                                                    </button>`
                                 }
                             </div>
                         </div>
