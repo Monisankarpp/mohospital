@@ -1,17 +1,25 @@
-@extends('layouts.patient-dashboard')
+@extends('layouts.base')
 @section('title', 'Prescriptions')
 
 @section('dashboard-content')
-    <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
+    <div class="container-fluid py-4 ps-lg-5">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="text-primary fw-semibold mb-1">
-                    <i class="fas fa-prescription-bottle-alt me-2 text-info"></i> My Prescriptions
-                </h2>
-                <p class="text-muted small mb-0">View all your past and active medication records here.</p>
+        <div
+            class="p-4 rounded-4 bg-light shadow-sm border-start border-4 border-primary d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 mt-4">
+            <div class="mb-3 mb-md-0">
+                <h3 class="h4 fw-bold text-primary mb-3 d-flex align-items-center">
+                    <i class="fas fa-prescription-bottle-alt me-3 text-primary fs-4"></i>
+                    My Prescriptions
+                </h3>
+                <p class="text-muted mb-0">View all your past and active medication records here with ease</p>
+            </div>
+
+            <div class="text-md-end">
+                <div class="text-muted small">Last Login</div>
+                <div class="fw-semibold text-dark">{{ now()->format('M j, Y h:i A') }}</div>
             </div>
         </div>
+
 
         <!-- Prescription Card -->
         <div class="card shadow-sm border-0 rounded-4">

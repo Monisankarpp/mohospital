@@ -1,22 +1,26 @@
-@extends('layouts.doctor-dashboard')
+@extends('layouts.base')
 @section('title', 'Prescription')
 
 @section('dashboard-content')
-    <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
-        <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between mb-4 gap-3">
-            <div>
-                <h3 class="h4 fw-semibold text-dark mb-2" style="color: #2c3e50;">Create New Prescription</h3>
-                <p class="text-muted small mb-0" style="color: #7f8c8d;">Carefully document your patient's treatment plan</p>
+    <div class="container-fluid py-4 ps-lg-5">
+        <div
+            class="p-4 rounded-4 bg-light shadow-sm border-start border-4 border-primary d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 mt-4">
+            <div class="mb-3 mb-md-0">
+                <h3 class="h4 fw-bold text-primary mb-3 d-flex align-items-center">
+                    <i class="fas fa-prescription-bottle-alt me-3 text-primary fs-4"></i>
+                    Create New Prescription
+                </h3>
+                <p class="text-muted mb-0">Carefully document your patient's treatment plan with ease</p>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge rounded-pill px-3 py-2" style="background-color: #e8f4fc; color: #3498db;">
-                    <i class="fas fa-prescription-bottle-alt me-2"></i>Medical Record
-                </span>
+
+            <div class="text-md-end">
+                <div class="text-muted small">Last Login</div>
+                <div class="fw-semibold text-dark">{{ now()->format('M j, Y h:i A') }}</div>
             </div>
         </div>
 
         {{-- Prescription Form --}}
-        <div class="card shadow-sm rounded-4 border-0" style="background-color: #f8fafc;">
+        <div class="card shadow-lg rounded-4 border-0" style="background-color: #f9faff;">
             <div class="card-body p-4 p-lg-5">
                 <form action="{{ route('doctor.prescription.store') }}" method="POST" enctype="multipart/form-data"
                     class="needs-validation" novalidate>
@@ -24,9 +28,8 @@
 
                     {{-- Patient Selection with Search --}}
                     <div class="mb-4">
-                        <label for="patient_id" class="form-label fw-medium" style="color: #2c3e50;">
-                            <i class="fas fa-user-injured me-2" style="color: #e74c3c;"></i>
-                            Select Patient
+                        <label for="patient_id" class="form-label fw-medium text-primary" style="font-weight: 600;">
+                            <i class="fas fa-user-injured me-2" style="color: #e74c3c;"></i> Select Patient
                         </label>
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0">
@@ -36,8 +39,7 @@
                                 style="border-left: 0; padding-left: 0;">
                                 <option value="" disabled selected>Search patient by name or ID</option>
                                 @foreach ($patients as $patient)
-                                    <option value="{{ $patient->id }}">{{ $patient->name }} ({{ $patient->id }})
-                                    </option>
+                                    <option value="{{ $patient->id }}">{{ $patient->name }} ({{ $patient->id }})</option>
                                 @endforeach
                             </select>
                         </div>
@@ -46,30 +48,28 @@
 
                     {{-- Prescription Notes with Text Editor --}}
                     <div class="mb-4">
-                        <label for="editor" class="form-label fw-medium" style="color: #2c3e50;">
-                            <i class="fas fa-file-medical me-2" style="color: #27ae60;"></i>
-                            Prescription Details
+                        <label for="editor" class="form-label fw-medium text-primary" style="font-weight: 600;">
+                            <i class="fas fa-file-medical me-2" style="color: #27ae60;"></i> Prescription Details
                         </label>
 
                         {{-- Toolbar --}}
-                        <div id="editor-toolbar" class="border rounded-top-3 p-2 bg-white">
+                        <div id="editor-toolbar" class="border rounded-3 p-2 bg-white mb-3">
                             <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-outline-secondary" data-command="bold" title="Bold">
+                                <button type="button" class="btn btn-outline-primary" data-command="bold" title="Bold">
                                     <i class="fas fa-bold"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" data-command="italic"
-                                    title="Italic">
+                                <button type="button" class="btn btn-outline-primary" data-command="italic" title="Italic">
                                     <i class="fas fa-italic"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" data-command="insertUnorderedList"
+                                <button type="button" class="btn btn-outline-primary" data-command="insertUnorderedList"
                                     title="Bullet List">
                                     <i class="fas fa-list-ul"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" data-command="insertOrderedList"
+                                <button type="button" class="btn btn-outline-primary" data-command="insertOrderedList"
                                     title="Numbered List">
                                     <i class="fas fa-list-ol"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" data-command="createLink"
+                                <button type="button" class="btn btn-outline-primary" data-command="createLink"
                                     title="Add Link">
                                     <i class="fas fa-link"></i>
                                 </button>
@@ -79,15 +79,14 @@
                         {{-- Editable Content Area --}}
                         <div id="editor" class="form-control prescription-editor border-top-0 rounded-bottom-3"
                             contenteditable="true"
-                            placeholder="Enter each medicine in format: Name | Dosage | Frequency | Duration">
-                        </div>
+                            placeholder="Enter each medicine in format: Name | Dosage | Frequency | Duration"></div>
 
                         {{-- Hidden Fields --}}
                         <textarea name="notes" id="notes" class="d-none" required></textarea>
                         <textarea name="medications" id="medications" class="d-none"></textarea>
 
                         {{-- Helper and Character Count --}}
-                        <div class="d-flex justify-content-between mt-1">
+                        <div class="d-flex justify-content-between mt-2">
                             <div class="form-text text-muted small">
                                 Format: <strong>Paracetamol 500mg | 1 tablet | Every 6 hours | 3 days</strong><br>
                                 Add one medicine per line.
@@ -98,15 +97,13 @@
 
                     {{-- File Upload --}}
                     <div class="mb-4">
-                        <label for="file" class="form-label fw-medium" style="color: #2c3e50;">
-                            <i class="fas fa-file-upload me-2" style="color: #9b59b6;"></i>
-                            Attach Supporting Documents
+                        <label for="file" class="form-label fw-medium text-primary" style="font-weight: 600;">
+                            <i class="fas fa-file-upload me-2" style="color: #9b59b6;"></i> Attach Supporting Documents
                         </label>
                         <div class="file-upload-wrapper position-relative">
                             <input type="file" name="file" id="file" class="form-control d-none"
                                 accept=".pdf,.jpg,.png,.jpeg">
-
-                            <div class="border rounded-3 p-3 text-center bg-white upload-area" style="cursor: pointer;"
+                            <div class="border rounded-3 p-4 text-center bg-white upload-area" style="cursor: pointer;"
                                 id="uploadArea">
                                 <div id="uploadPlaceholder"
                                     class="d-flex flex-column align-items-center justify-content-center"
@@ -163,6 +160,7 @@
                 </form>
             </div>
         </div>
+
     </div>
 
     <style>

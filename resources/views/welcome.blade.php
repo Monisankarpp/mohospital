@@ -647,8 +647,8 @@
                                     <h6 class="mb-0 fw-semibold text-dark">
                                         <i class="far fa-calendar text-primary me-2"></i> Select Date
                                     </h6>
-                                    <span class="badge bg-light text-muted fw-normal small" id="currentMonth">June
-                                        2023</span>
+                                    <span class="badge bg-light text-muted fw-normal small" id="currentMonth">May
+                                        2025</span>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
                                     <button type="button"
@@ -805,8 +805,20 @@
                     <div class="mb-4">
                         <h6 class="mb-3 fw-semibold"><i class="fas fa-credit-card me-2 text-primary"></i>Payment
                             Method</h6>
-                        <div id="card-element" class="form-control p-3 rounded-3 shadow-sm border"></div>
+                        <div class="mb-3">
+                            <label class="form-label">Card Number</label>
+                            <div id="card-number-element" class="form-control p-3 rounded-3 shadow-sm border"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Expiry Date</label>
+                            <div id="card-expiry-element" class="form-control p-3 rounded-3 shadow-sm border"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">CVC</label>
+                            <div id="card-cvc-element" class="form-control p-3 rounded-3 shadow-sm border"></div>
+                        </div>
                         <div id="card-errors" class="text-danger small mt-2" role="alert"></div>
+
 
                         <!-- Payment security badges -->
                         <div class="d-flex justify-content-center gap-3 mt-3">
@@ -1194,8 +1206,16 @@
             // Handle "Pay Now" click
             let stripe = Stripe("{{ config('services.stripe.key') }}");
             let elements = stripe.elements();
-            let cardElement = elements.create('card');
-            cardElement.mount('#card-element');
+
+            // Create individual elements
+            let cardNumber = elements.create('cardNumber');
+            let cardExpiry = elements.create('cardExpiry');
+            let cardCvc = elements.create('cardCvc');
+
+            // Mount them into the DOM
+            cardNumber.mount('#card-number-element');
+            cardExpiry.mount('#card-expiry-element');
+            cardCvc.mount('#card-cvc-element');
 
             document.getElementById('payNowBtn').addEventListener('click', function() {
                 // Fetch client secret from server
@@ -1228,11 +1248,13 @@
                     .then(data => {
                         stripe.confirmCardPayment(data.client_secret, {
                             payment_method: {
-                                card: cardElement
+                                card: cardNumber
                             }
                         }).then(result => {
                             if (result.error) {
-                                alert(result.error.message);
+                                document.getElementById('card-errors').textContent = result
+                                    .error.message;
+                                Swal.close();
                             } else {
                                 // Payment succeeded
                                 fetch('/payment/success', {

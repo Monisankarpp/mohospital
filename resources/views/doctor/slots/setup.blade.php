@@ -1,9 +1,9 @@
-@extends('layouts.doctor-dashboard')
+@extends('layouts.base')
 
 @section('title', 'Schedule Setup')
 
 @section('content')
-    <div class="container-fluid py-5 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
+    <div class="container-fluid py-4 ps-lg-5">
         <div class="container">
             <!-- Back Button -->
             <div class="mb-4">

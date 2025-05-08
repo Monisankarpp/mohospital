@@ -1,9 +1,9 @@
-@extends('layouts.doctor-dashboard')
+@extends('layouts.base')
 
 @section('title', 'Edit Appointment Slot')
 
-@section('content')
-    <div class="container-fluid py-5 px-4" style="margin-left: 250px; max-width: calc(100% - 250px);">
+@section('dashboard-content')
+    <div class="container-fluid py-4 ps-lg-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card border-0 shadow-lg rounded-4">

@@ -1,9 +1,9 @@
-@extends('layouts.patient-dashboard')
+@extends('layouts.base')
 
 @section('title', 'Profile')
 
 @section('dashboard-content')
-    <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
+    <div class="container-fluid py-4 ps-lg-5">
         <div class="card border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
             <div class="card-header bg-primary bg-opacity-10 py-3 border-0">
                 <h4 class="mb-0 text-primary">

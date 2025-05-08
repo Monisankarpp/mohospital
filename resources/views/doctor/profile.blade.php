@@ -1,9 +1,25 @@
-@extends('layouts.patient-dashboard')
+@extends('layouts.base')
 
 @section('title', 'Profile')
 
 @section('dashboard-content')
-    <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
+    <div class="container-fluid py-4 ps-lg-5">
+        <div
+            class="p-4 rounded-4 bg-light shadow-sm border-start border-4 border-primary d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 mt-4">
+            <div class="mb-3 mb-md-0">
+                <h2 class="h4 fw-bold text-primary mb-3 d-flex align-items-center">
+                    <i class="fas fa-user-md me-3 text-primary fs-4"></i>
+                    Doctor Profile
+                </h2>
+                <p class="text-muted mb-0">Manage your personal information, specialization, and contact details</p>
+            </div>
+
+            <div class="text-md-end">
+                <div class="text-muted small">Last updated</div>
+                <div class="fw-semibold text-dark">{{ now()->format('M j, Y h:i A') }}</div>
+            </div>
+        </div>
+
         <div class="card border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
             <div class="card-header bg-primary bg-opacity-10 py-3 border-0">
                 <h4 class="mb-0 text-primary">

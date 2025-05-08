@@ -1,8 +1,24 @@
-@extends('layouts.patient-dashboard')
+@extends('layouts.base')
 @section('title', 'My Appointments')
 
 @section('dashboard-content')
-    <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
+    <div class="container-fluid py-4 ps-lg-5">
+        <div
+            class="p-4 rounded-4 bg-light shadow-sm border-start border-4 border-primary d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 mt-4">
+            <div class="mb-3 mb-md-0">
+                <h2 class="h4 fw-bold text-primary mb-3 d-flex align-items-center">
+                    <i class="fas fa-calendar-alt me-3 text-primary fs-4"></i>
+                    My Appointments
+                </h2>
+                <p class="text-muted mb-0">View and manage your upcoming appointments with ease</p>
+            </div>
+
+            <div class="text-md-end">
+                <div class="text-muted small">Last Login</div>
+                <div class="fw-semibold text-dark">{{ now()->format('M j, Y h:i A') }}</div>
+            </div>
+        </div>
+
         <div class="card mb-4 border-0"
             style="border-radius: 16px; background: linear-gradient(145deg, #ffffff, #f8f9fa); box-shadow: 0 6px 20px rgba(100, 149, 237, 0.15);">
             <div class="card-header bg-transparent border-0 pt-4 pb-3 d-flex justify-content-between align-items-center">
@@ -113,7 +129,7 @@
         </div>
     </div>
 
-    <div class="container-fluid py-4 ps-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
+    <div class="container-fluid py-4 ps-lg-5">
         <div class="card mb-4 border-0"
             style="border-radius: 16px; background: linear-gradient(145deg, #ffffff, #f8f9fa); box-shadow: 0 6px 20px rgba(39, 174, 96, 0.15);">
             <div class="card-header bg-transparent border-0 pt-4 pb-3 d-flex justify-content-between align-items-center">

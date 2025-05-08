@@ -1,18 +1,25 @@
-@extends('layouts.doctor-dashboard')
+@extends('layouts.base')
 
 @section('title', 'My Appointments')
 
-@section('content')
-    <div class="container-fluid py-4 ps-lg-5 pe-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
-        <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h2 class="fw-bold mb-1 text-dark">
-                    <i class="fas fa-calendar-alt me-2 text-primary"></i> My Appointments
+@section('dashboard-content')
+    <div class="container-fluid py-4 ps-lg-5"> <!-- Page Header -->
+        <div
+            class="p-4 rounded-4 bg-light shadow-sm border-start border-4 border-primary d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 mt-4">
+            <div class="mb-3 mb-md-0">
+                <h2 class="h4 fw-bold text-primary mb-3 d-flex align-items-center">
+                    <i class="fas fa-calendar-alt me-3 text-primary fs-4"></i>
+                    My Appointments
                 </h2>
-                <p class="text-muted mb-0">View and manage your upcoming patient appointments</p>
+                <p class="text-muted mb-0">View and manage your upcoming patient appointments with ease</p>
+            </div>
+
+            <div class="text-md-end">
+                <div class="text-muted small">Last Login</div>
+                <div class="fw-semibold text-dark">{{ now()->format('M j, Y h:i A') }}</div>
             </div>
         </div>
+
 
         @if ($appointments->count())
             <div class="card border-0 shadow-sm rounded-4">
@@ -259,6 +266,20 @@
         // Reschedule
         document.querySelectorAll('.reschedule-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
+                const rawDatetime = btn.dataset.date;
+                const [date, time] = rawDatetime.split(' ');
+                const formattedDate = new Date(date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                const formattedTime = new Date(`1970-01-01T${time}`).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
                 const wrapper = document.createElement('div');
                 wrapper.innerHTML = `
             <label class="mb-2">Select new date & time:</label>

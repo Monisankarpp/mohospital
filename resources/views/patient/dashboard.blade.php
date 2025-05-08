@@ -1,42 +1,49 @@
-@extends('layouts.patient-dashboard')
+@extends('layouts.base')
 
 @section('title', 'Dashboard')
 
 @section('dashboard-content')
     <div class="container-fluid py-4 ps-lg-5"
-        style="margin-left: 250px; max-width: calc(100% - 250px); background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%); min-height: 100vh;">
+        style=" background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%); min-height: 100vh;">
 
         <!-- Welcome Header with Glassmorphism -->
-        <div class="row mb-4">
+        <div class="row mt-4 mb-4">
             <div class="col-12">
-                <div class="card border-0"
+                <div class="card border-0 shadow-sm"
                     style="
-                    border-radius: 16px; 
-                    background: rgba(255, 255, 255, 0.65);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.18);
-                ">
+                        border-radius: 1rem;
+                        background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(245,245,245,0.85));
+                        backdrop-filter: blur(10px);
+                        -webkit-backdrop-filter: blur(10px);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                    ">
                     <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                             <div>
-                                <h2 class="mb-1" style="color: #2c3e50; font-weight: 600;">Welcome Back,
-                                    {{ Auth::user()->name }}!</h2>
+                                <h2 class="mb-2 text-primary fw-semibold" style="font-size: 1.75rem;">
+                                    Welcome Back, {{ Auth::user()->name }}!
+                                </h2>
                                 <p class="mb-0 text-muted" style="font-size: 0.95rem;">
-                                    <i class="fas fa-calendar-day me-1 text-primary"></i>
+                                    <i class="fas fa-calendar-day me-2 text-primary"></i>
                                     Today is {{ now()->format('l, F j, Y') }}
                                 </p>
                             </div>
-                            <div class="rounded-circle d-flex align-items-center justify-content-center"
-                                style="width: 60px; height: 60px; background: rgba(52, 152, 219, 0.2); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);">
-                                <i class="fas fa-user-md" style="color: #3498db; font-size: 1.5rem;"></i>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                style="
+                                    width: 64px;
+                                    height: 64px;
+                                    background: rgba(52, 152, 219, 0.15);
+                                    backdrop-filter: blur(4px);
+                                    border: 1px solid rgba(52, 152, 219, 0.3);
+                                ">
+                                <i class="fas fa-user-md text-primary" style="font-size: 1.5rem;"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
 
         <!-- Stats Cards with Glassmorphism -->
         <div class="row mb-4">

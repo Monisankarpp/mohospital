@@ -1,25 +1,30 @@
-@extends('layouts.doctor-dashboard')
+@extends('layouts.base')
 
 @section('title', 'Schedule Management')
 
-@section('content')
-    <div class="container-fluid ps-lg-5 pe-lg-5" style="margin-left: 250px; max-width: calc(100% - 250px);">
-        <!-- Header Section -->
-        <div class="row justify-content-between align-items-center mb-4">
-            <div class="col-md-6">
-                <h2 class="text-primary">Your Schedule & Slots</h2>
+@section('dashboard-content')
+    <div class="container-fluid py-4 ps-lg-5"> <!-- Header Section -->
+        <div class="p-4 rounded-4 bg-light shadow-sm border-start border-4 border-primary d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-5 mt-4">
+            <div class="mb-3 mb-md-0">
+                <h2 class="h4 fw-bold text-primary mb-3 d-flex align-items-center">
+                    <i class="fas fa-calendar-check me-3 text-primary fs-4"></i>
+                    Your Schedule & Slots
+                </h2>
+                <p class="text-muted mb-0">Create or apply default weekly schedules to manage your availability</p>
             </div>
-            <div class="col-md-6 text-end">
+        
+            <div class="text-md-end d-flex flex-column flex-md-row gap-2">
                 <a href="{{ route('doctor.slots.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i> Create New Schedule
                 </a>
                 @if (auth()->user()->doctor->default_schedule)
-                    <a href="{{ route('doctor.slots.apply-default') }}" class="btn btn-outline-secondary ms-2">
+                    <a href="{{ route('doctor.slots.apply-default') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-redo me-2"></i> Apply Default Schedule
                     </a>
                 @endif
             </div>
         </div>
+        
 
         <!-- Weekly Schedule Card -->
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
@@ -358,19 +363,19 @@
                                 </div>
                                 ${isBooked
                                     ? `<button class="btn btn-sm btn-outline-primary w-100 view-patient-btn mt-2"
-                                                                                                                                                                                            data-name="${slot.appointment.user.name || 'N/A'}"
-                                                                                                                                                                                            data-email="${slot.appointment.user.email || 'N/A'}"
-                                                                                                                                                                                            data-phone="${slot.appointment.user.phone || 'N/A'}">
-                                                                                                                                                                                            <i class="bi bi-person-circle me-1"></i> View Patient
-                                                                                                                                                                                        </button>`
+                                                                                                                                                                                                                                                                        data-name="${slot.appointment.user.name || 'N/A'}"
+                                                                                                                                                                                                                                                                        data-email="${slot.appointment.user.email || 'N/A'}"
+                                                                                                                                                                                                                                                                        data-phone="${slot.appointment.user.phone || 'N/A'}">
+                                                                                                                                                                                                                                                                        <i class="bi bi-person-circle me-1"></i> View Patient
+                                                                                                                                                                                                                                                                    </button>`
                                     : isBreak
                                     ? `<button class="btn btn-sm btn-warning w-100 mt-2" disabled>
-                                                                                                                                                                                            <i class="bi bi-pause me-1"></i> Break Taken
-                                                                                                                                                                                        </button>`
+                                                                                                                                                                                                                                                                        <i class="bi bi-pause me-1"></i> Break Taken
+                                                                                                                                                                                                                                                                    </button>`
                                     : `<button class="btn btn-sm btn-primary w-100 mt-2 take-break-btn"
-                                                                                                                                                                                    data-slot-id="${slot.id}">
-                                                                                                                                                                                        <i class="bi bi-pause me-1"></i> Let's Take a Break
-                                                                                                                                                                                    </button>`
+                                                                                                                                                                                                                                                                data-slot-id="${slot.id}">
+                                                                                                                                                                                                                                                                    <i class="bi bi-pause me-1"></i> Let's Take a Break
+                                                                                                                                                                                                                                                                </button>`
                                 }
                             </div>
                         </div>
