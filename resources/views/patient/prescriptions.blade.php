@@ -21,92 +21,115 @@
         </div>
 
 
-        <!-- Prescription Card -->
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                <h5 class="mb-0 text-dark">
-                    <i class="fas fa-history me-2 text-secondary"></i> Prescription History
-                </h5>
+       <!-- Prescription History Card -->
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-prescription-bottle-alt me-3 text-primary fs-4"></i>
+                    <h5 class="mb-0 text-primary fw-bold border-start border-primary border-4 ps-3 py-1">
+                        Prescription History
+                    </h5>
+                </div>
+                @if($prescriptions->total() > 0) {{-- Conditionally show badge --}}
+                <span class="badge bg-primary-subtle text-primary-emphasis fw-semibold px-3 py-2 rounded-pill">
+                    Total: {{ $prescriptions->total() }}
+                </span>
+                @endif
             </div>
 
             <div class="card-body p-0">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light text-muted small text-uppercase sticky-top" style="z-index: 1; top: 0;">
-                        <tr class="border-bottom fw-semibold">
-                            <th class="ps-4 py-3">Doctor</th>
-                            <th class="py-3">Date</th>
-                            <th class="py-3">Medications</th>
-                            <th class="py-3">Status</th>
-                            <th class="pe-4 py-3 text-end">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($prescriptions as $prescription)
-                            <tr class="border-bottom">
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-3"
-                                            style="width: 42px; height: 42px;">
-                                            <i class="fas fa-user-md"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold">{{ $prescription->doctor->user->name }}</div>
-                                            <small class="text-muted">Main Hospital</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3">
-                                    <span
-                                        class="fw-medium">{{ \Carbon\Carbon::parse($prescription->date)->format('M d, Y') }}</span><br>
-                                    <small
-                                        class="text-muted">{{ \Carbon\Carbon::parse($prescription->date)->format('h:i A') }}</small>
-                                </td>
-                                <td class="py-3">
-                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">
-                                        <i class="fas fa-pills me-1"></i> {{ $prescription->medications }} Meds
-                                    </span>
-                                </td>
-                                <td class="py-3">
-                                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">
-                                        <i class="fas fa-check-circle me-1"></i> Active
-                                    </span>
-                                </td>
-                                <td class="pe-4 py-3 text-end">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <a href="javascript:void(0);"
-                                            class="btn btn-sm btn-outline-primary rounded-pill px-3 view-invoice-btn"
-                                            data-url="{{ route('invoices.show', $prescription->id) }}">
-                                            <i class="fas fa-eye me-1"></i> View
-                                        </a>
-
-                                        <a href="javascript:void(0);"
-                                            class="btn btn-sm btn-outline-success rounded-pill px-3 download-invoice-btn"
-                                            data-url="{{ route('generate.invoice', $prescription->id) }}">
-                                            <i class="fas fa-download me-1"></i> PDF
-                                        </a>
-
-                                    </div>
-                                </td>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted text-uppercase small sticky-top" style="z-index: 1; top: 0;">
+                            <tr class="border-bottom fw-semibold">
+                                <th class="ps-4 py-3">Doctor</th>
+                                <th class="py-3">Date</th>
+                                <th class="py-3">Medications</th>
+                                <th class="py-3">Status</th>
+                                <th class="pe-4 py-3 text-end">Actions</th>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">No prescriptions found.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @forelse ($prescriptions as $prescription)
+                                <tr class="border-bottom prescription-row">
+                                    <!-- Doctor Info -->
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex justify-content-center align-items-center me-3"
+                                                style="width: 42px; height: 42px;">
+                                                <i class="fas fa-user-md"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold">{{ $prescription->doctor->user->name ?? 'Unknown' }}</div>
+                                                <small class="text-muted">Main Hospital</small>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Date -->
+                                    <td class="py-3">
+                                        <div class="fw-medium">
+                                            {{ \Carbon\Carbon::parse($prescription->date)->format('M d, Y') }}
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ \Carbon\Carbon::parse($prescription->date)->format('h:i A') }}
+                                        </small>
+                                    </td>
+
+                                    <!-- Medications -->
+                                    <td class="py-3">
+                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                                            <i class="fas fa-pills me-1"></i>
+                                            {{ $prescription->medications }} Meds
+                                        </span>
+                                    </td>
+
+                                    <!-- Status -->
+                                    <td class="py-3">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                                            <i class="fas fa-check-circle me-1"></i> Active
+                                        </span>
+                                    </td>
+
+                                    <!-- Actions -->
+                                    <td class="pe-4 py-3 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="javascript:void(0);"
+                                                class="btn btn-sm btn-outline-primary rounded-pill px-3 view-invoice-btn"
+                                                data-url="{{ route('invoices.show', $prescription->id) }}">
+                                                <i class="fas fa-eye me-1"></i> View
+                                            </a>
+                                            <a href="javascript:void(0);"
+                                                class="btn btn-sm btn-outline-success rounded-pill px-3 download-invoice-btn"
+                                                data-url="{{ route('generate.invoice', $prescription->id) }}">
+                                                <i class="fas fa-download me-1"></i> PDF
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="fas fa-notes-medical fa-2x mb-3 text-secondary"></i><br>
+                                        No prescriptions found.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="card-footer bg-white border-top-0 py-3 px-4 d-flex justify-content-between align-items-center">
+            <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
                 <div class="text-muted small">
-                    Showing <span class="fw-semibold">{{ $prescriptions->count() }}</span> of {{ $prescriptions->total() }}
-                    prescriptions
+                    Showing <strong>{{ $prescriptions->count() }}</strong> of <strong>{{ $prescriptions->total() }}</strong> prescriptions
                 </div>
                 <div>
                     {{ $prescriptions->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>
+
 
         <!-- Invoice Modal -->
         <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">

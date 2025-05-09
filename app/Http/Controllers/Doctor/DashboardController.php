@@ -19,10 +19,11 @@ class DashboardController extends Controller
 
 		$doctorId = auth()->user()->doctor->id;
 
-		$upcomingAppointmentsCount = Appointment::whereHas('slot', function ($query) use ($doctorId) {
-			$query->where('doctor_id', $doctorId)
-				->where('start_time', '>=', now());
-		})
+		$upcomingAppointmentsCount = Appointment::where('status', '!=', 'completed')
+			->whereHas('slot', function ($query) use ($doctorId) {
+				$query->where('doctor_id', $doctorId)
+					->where('start_time', '>=', now());
+			})
 			->count();
 
 		$totalPatientsCount = Appointment::whereHas('slot', function ($query) use ($doctorId) {
@@ -45,7 +46,7 @@ class DashboardController extends Controller
 			->where('slots.doctor_id', auth()->user()->doctor->id)
 			->orderBy('slots.start_time', 'asc')
 			->select('appointments.*')
-			->take(3)
+			->take(12)
 			->get();
 
 		$recentPatients = Appointment::with('patient')
@@ -61,10 +62,13 @@ class DashboardController extends Controller
 		$weeklyAppointments = Appointment::whereHas('slot', function ($query) use ($doctorId) {
 			$query->where('doctor_id', $doctorId);
 		})
-			->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+			->whereHas('slot', function ($query) {
+				$query->whereBetween('date', [now()->startOfWeek(), now()->endOfWeek()]);
+			})
+			->where('status', 'completed')
 			->get()
 			->groupBy(function ($appointment) {
-				return Carbon::parse($appointment->created_at)->format('l');
+				return Carbon::parse($appointment->slot->date)->format('l');
 			});
 
 		$chartData = collect(Carbon::getDays())->map(function ($day) use ($weeklyAppointments) {

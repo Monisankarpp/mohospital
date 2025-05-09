@@ -49,7 +49,7 @@
                         </thead>
                         <tbody>
                             @forelse ($recentPatients as $appointment)
-                                <tr class="patient-row" data-patient="{{ strtolower($appointment->patient->name) }}"
+                                <tr class="patient-row" data-patient="{{ strtolower($appointment->name) }}"
                                     data-date="{{ $appointment->created_at->format('M d, Y') }}">
                                     <td class="ps-4 py-3">
                                         <div class="d-flex align-items-center">
@@ -59,9 +59,9 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h6 class="mb-1 fw-semibold">{{ $appointment->patient->name }}</h6>
+                                                <h6 class="mb-1 fw-semibold">{{ $appointment->name }}</h6>
                                                 <small class="text-muted">{{ rand(15, 80) }} years • ID:
-                                                    {{ $appointment->patient->id }}</small>
+                                                    {{ $appointment->id }}</small>
                                             </div>
                                         </div>
                                     </td>
@@ -80,7 +80,7 @@
                                     </td>
                                     <td class="pe-4 py-3 text-end">
                                         <div class="d-flex justify-content-end gap-2">
-                                            <a href="{{ route('doctor.message.patient', ['patient_id' => $appointment->patient->id]) }}"
+                                            <a href="{{ route('doctor.message.patient', ['patient_id' => $appointment->id]) }}"
                                                 class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                                 <i class="fas fa-comment-medical me-1"></i>Message
                                             </a>

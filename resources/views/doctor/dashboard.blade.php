@@ -107,7 +107,7 @@
                         </h5>
                         <p class="small text-muted mb-0">Weekly appointment trends</p>
                     </div>
-                    <div class="dropdown">
+                    {{-- <div class="dropdown">
                         <button class="btn btn-sm bg-white rounded-pill px-3 py-2 dropdown-toggle shadow-sm" type="button"
                             id="chartPeriodDropdown" data-bs-toggle="dropdown"
                             style="background-color: rgba(255,255,255,0.8) !important; border: 1px solid rgba(0,0,0,0.05)">
@@ -122,7 +122,7 @@
                             <li><a class="dropdown-item rounded-lg px-3 py-2" href="#"><i
                                         class="far fa-calendar-alt me-2 text-muted"></i>This Year</a></li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
 

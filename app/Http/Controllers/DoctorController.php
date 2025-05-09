@@ -127,7 +127,7 @@ class DoctorController extends Controller
     {
         $patient = User::findOrFail($patient_id);
 
-        SendDoctorMessageEmail::dispatch($patient); // Queued job
+        SendDoctorMessageEmail::dispatch($patient);
 
         return redirect()->back()->with('success', 'Message is being sent to the patient.');
     }
